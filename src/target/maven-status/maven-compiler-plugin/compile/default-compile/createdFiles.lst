@@ -1,0 +1,6 @@
+com\example\controller\ChatController.class
+com\example\service\ChatService.class
+com\example\service\impl\ChatServiceImpl.class
+com\example\Application.class
+com\example\entity\ChatMessage.class
+com\example\config\DashScopeConfig.class
