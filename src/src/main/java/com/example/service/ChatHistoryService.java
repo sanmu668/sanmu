@@ -1,48 +1,56 @@
 package com.example.service;
 
 import com.example.entity.ChatMessage;
+import com.example.repository.ChatMessageRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 聊天历史记录管理服务
  */
 @Service
 public class ChatHistoryService {
+  @Autowired
+  private ChatMessageRepository chatMessageRepository;
 
-  /**
-   * 使用ConcurrentHashMap存储会话历史记录
-   * key: sessionId
-   * value: 该会话的消息列表
+  /*
+  保存对话记录
    */
-  private final Map<String, List<ChatMessage>> sessionHistories = new ConcurrentHashMap<>();
-
-  /**
-   * 添加消息到历史记录
-   */
-  public void addMessage(ChatMessage message) {
-    String sessionId = message.getSessionId();
-    sessionHistories.computeIfAbsent(sessionId, k -> new ArrayList<>()).add(message);
-
-    // 保持最近的10条消息
-    List<ChatMessage> history = sessionHistories.get(sessionId);
-    if (history.size() > 10) {
-      sessionHistories.put(sessionId, history.subList(history.size() - 10, history.size()));
-    }
+  @Transactional
+  public ChatMessage saveMessage(Integer userId,String sessionId,String question,String answer){
+    ChatMessage message = new ChatMessage(userId, sessionId, question, answer);
+    return chatMessageRepository.save(message);
   }
 
-  /**
-   * 获取会话的历史记录
+  /*
+  获取用户的所有对话记录
    */
-  public List<ChatMessage> getSessionHistory(String sessionId) {
-    return sessionHistories.getOrDefault(sessionId, new ArrayList<>());
+
+  public List<ChatMessage> getUserHistory(Integer userId){
+    return chatMessageRepository.findByUserId(userId);
   }
 
-  /**
-   * 清除会话历史
+  /*
+  根据会话ID获取对话记录
    */
-  public void clearSessionHistory(String sessionId) {
-    sessionHistories.remove(sessionId);
+  public List<ChatMessage> getSessionHistory(String sessionId){
+    return chatMessageRepository.findBySessionId(sessionId);
+  }
+
+  /*
+  根据用户ID和会话ID获取对话记录
+   */
+  public List<ChatMessage> getUserSession(Integer userId,String sessionId){
+    return chatMessageRepository.findByUserIdAndSessionId(userId,sessionId);
+  }
+
+  /*
+  根据用户ID获取最新的对话记录
+   */
+  public List<ChatMessage> findTopNByUserIdOrderByTimestampDesc(Integer userId,int limit){
+    return chatMessageRepository.findByUserIdOrderByTimestampDesc(userId,limit);
   }
 }

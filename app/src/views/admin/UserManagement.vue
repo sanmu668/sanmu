@@ -17,19 +17,11 @@
             clearable
           />
         </el-form-item>
-        <el-form-item label="状态">
-          <el-select v-model="searchForm.status" placeholder="请选择状态" clearable>
-            <el-option label="正常" value="active" />
-            <el-option label="禁用" value="disabled" />
-          </el-select>
-        </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleSearch">
-            <el-icon><Search /></el-icon>
             搜索
           </el-button>
           <el-button @click="resetSearch">
-            <el-icon><Refresh /></el-icon>
             重置
           </el-button>
         </el-form-item>
@@ -56,23 +48,19 @@
       >
         <el-table-column type="selection" width="55" />
         <el-table-column prop="id" label="ID" width="80" />
-        <el-table-column prop="avatar" label="头像" width="80">
+        <el-table-column prop="photoBase64" label="头像" width="80">
           <template #default="{ row }">
-            <el-avatar :size="40" :src="row.avatar" />
+            <el-avatar 
+              :size="40" 
+              :src="row.photoBase64 ? `data:image/jpeg;base64,${row.photoBase64}` : ''" 
+            />
           </template>
         </el-table-column>
         <el-table-column prop="username" label="用户名" />
         <el-table-column prop="email" label="邮箱" />
-        <el-table-column prop="phone" label="手机号" />
-        <el-table-column prop="registerTime" label="注册时间" width="180" />
-        <el-table-column prop="status" label="状态" width="100">
-          <template #default="{ row }">
-            <el-tag :type="row.status === 'active' ? 'success' : 'danger'">
-              {{ row.status === 'active' ? '正常' : '禁用' }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" width="200" fixed="right">
+        <el-table-column prop="number" label="号码" />
+        <el-table-column prop="createdAt" label="创建时间" width="180" />
+        <el-table-column label="操作" width="150" fixed="right">
           <template #default="{ row }">
             <el-button-group>
               <el-button
@@ -83,18 +71,11 @@
                 编辑
               </el-button>
               <el-button
-                type="primary"
+                type="danger"
                 link
-                @click="handleResetPassword(row)"
+                @click="handleDelete(row)"
               >
-                重置密码
-              </el-button>
-              <el-button
-                :type="row.status === 'active' ? 'danger' : 'success'"
-                link
-                @click="handleToggleStatus(row)"
-              >
-                {{ row.status === 'active' ? '禁用' : '启用' }}
+                删除
               </el-button>
             </el-button-group>
           </template>
@@ -133,22 +114,16 @@
         <el-form-item label="邮箱" prop="email">
           <el-input v-model="userForm.email" placeholder="请输入邮箱" />
         </el-form-item>
-        <el-form-item label="手机号" prop="phone">
-          <el-input v-model="userForm.phone" placeholder="请输入手机号" />
+        <el-form-item label="号码" prop="number">
+          <el-input v-model="userForm.number" placeholder="请输入号码" />
         </el-form-item>
-        <el-form-item label="密码" prop="password" v-if="dialogType === 'add'">
+        <el-form-item label="密码" prop="passwordHash" v-if="dialogType === 'add'">
           <el-input
-            v-model="userForm.password"
+            v-model="userForm.passwordHash"
             type="password"
             placeholder="请输入密码"
             show-password
           />
-        </el-form-item>
-        <el-form-item label="状态" prop="status">
-          <el-radio-group v-model="userForm.status">
-            <el-radio label="active">正常</el-radio>
-            <el-radio label="disabled">禁用</el-radio>
-          </el-radio-group>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -164,95 +139,107 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import type { Ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
-import { Search, Refresh, Plus } from '@element-plus/icons-vue'
-
-interface UserForm {
-  username: string
-  email: string
-  phone: string
-  password: string
-  status: 'active' | 'disabled'
-}
-
-interface User extends Omit<UserForm, 'password'> {
-  id: number
-  avatar: string
-  registerTime: string
-}
+import { Plus } from '@element-plus/icons-vue'
+import { createUser, getAllUsers, deleteUser, getUserByUsername, getUserByEmail } from '@/api/userService'
+import type { User, UserDTO } from '@/types/user'
 
 // 搜索表单
 const searchForm = reactive({
   username: '',
   email: '',
-  status: ''
 })
 
 // 用户列表数据
 const loading = ref(false)
-const userList: Ref<User[]> = ref([
-  {
-    id: 1,
-    avatar: 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png',
-    username: 'user1',
-    email: 'user1@example.com',
-    phone: '13800138001',
-    registerTime: '2024-03-20 10:00:00',
-    status: 'active'
-  }
-])
+const userList: Ref<UserDTO[]> = ref([])
 
 // 分页相关
 const currentPage = ref(1)
 const pageSize = ref(10)
-const total = ref(100)
+const total = ref(0)
 
 // 对话框相关
 const dialogVisible = ref(false)
 const dialogType = ref<'add' | 'edit'>('add')
 const userFormRef = ref<FormInstance>()
-const userForm = reactive<UserForm>({
+const userForm = reactive<User>({
   username: '',
   email: '',
-  phone: '',
-  password: '',
-  status: 'active'
+  number: '',
+  passwordHash: ''
 })
 
 // 表单验证规则
 const userFormRules: FormRules = {
   username: [
     { required: true, message: '请输入用户名', trigger: 'blur' },
-    { min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'blur' }
+    { min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur' }
   ],
   email: [
     { required: true, message: '请输入邮箱', trigger: 'blur' },
     { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur' }
   ],
-  phone: [
-    { required: true, message: '请输入手机号', trigger: 'blur' },
-    { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }
+  number: [
+    { required: true, message: '请输入号码', trigger: 'blur' }
   ],
-  password: [
+  passwordHash: [
     { required: true, message: '请输入密码', trigger: 'blur' },
-    { min: 6, max: 20, message: '长度在 6 到 20 个字符', trigger: 'blur' }
+    { min: 6, message: '密码长度不能小于6位', trigger: 'blur' }
   ]
 }
 
 // 搜索处理
-const handleSearch = () => {
-  // TODO: 实现搜索逻辑
-  console.log('Search form:', searchForm)
+const handleSearch = async () => {
+  loading.value = true
+  try {
+    let data
+    if (searchForm.username) {
+      data = await getUserByUsername(searchForm.username)
+      if (Array.isArray(data)) {
+        userList.value = data
+        total.value = data.length
+      } else {
+        userList.value = []
+        total.value = 0
+      }
+    } else if (searchForm.email) {
+      data = await getUserByEmail(searchForm.email)
+      // 邮箱搜索返回单个对象
+      if (data) {
+        userList.value = [data]
+        total.value = 1
+      } else {
+        userList.value = []
+        total.value = 0
+      }
+    } else {
+      data = await getAllUsers()
+      if (Array.isArray(data)) {
+        userList.value = data
+        total.value = data.length
+      } else {
+        userList.value = []
+        total.value = 0
+      }
+    }
+  } catch (error) {
+    console.error('搜索失败:', error)
+    ElMessage.error('搜索失败')
+    userList.value = []
+    total.value = 0
+  } finally {
+    loading.value = false
+  }
 }
 
 // 重置搜索
 const resetSearch = () => {
   searchForm.username = ''
   searchForm.email = ''
-  searchForm.status = ''
   handleSearch()
 }
 
@@ -268,12 +255,22 @@ const handleCurrentChange = (val: number) => {
 }
 
 // 获取用户列表
-const fetchUserList = () => {
+const fetchUserList = async () => {
   loading.value = true
-  // TODO: 实现获取用户列表的接口调用
-  setTimeout(() => {
+  try {
+    const response = await getAllUsers()
+    if (Array.isArray(response)) {
+      userList.value = response
+      total.value = response.length
+    } else {
+      ElMessage.error('获取用户列表数据格式错误')
+    }
+  } catch (error) {
+    console.error('获取用户列表失败:', error)
+    ElMessage.error('获取用户列表失败')
+  } finally {
     loading.value = false
-  }, 500)
+  }
 }
 
 // 新增用户
@@ -282,69 +279,81 @@ const handleAdd = () => {
   dialogVisible.value = true
   userForm.username = ''
   userForm.email = ''
-  userForm.phone = ''
-  userForm.password = ''
-  userForm.status = 'active'
+  userForm.number = ''
+  userForm.passwordHash = ''
 }
 
 // 编辑用户
-const handleEdit = (row: any) => {
+const handleEdit = (row: UserDTO) => {
   dialogType.value = 'edit'
   dialogVisible.value = true
-  Object.assign(userForm, row)
+  Object.assign(userForm, {
+    username: row.username,
+    email: row.email,
+    number: row.number
+  })
+  userForm.passwordHash = '' // 清空密码字段
 }
 
 // 提交表单
 const handleSubmit = async () => {
   if (!userFormRef.value) return
   
-  await userFormRef.value.validate((valid) => {
+  await userFormRef.value.validate(async (valid) => {
     if (valid) {
-      // TODO: 实现提交逻辑
-      console.log('Submit form:', userForm)
-      dialogVisible.value = false
-      ElMessage.success(dialogType.value === 'add' ? '添加成功' : '修改成功')
+      try {
+        if (dialogType.value === 'add') {
+          // 创建新用户时，确保包含所有必要字段
+          const now = new Date().toISOString()
+          const newUser = {
+            ...userForm,
+            role: 'user',
+            createdAt: now,
+            updateAt: now,
+            lastLogin: now,
+            photo: null
+          }
+          await createUser(newUser)
+          ElMessage.success('添加成功')
+        } else {
+          // TODO: 实现编辑用户的接口调用
+          ElMessage.success('修改成功')
+        }
+        dialogVisible.value = false
+        fetchUserList()
+      } catch (error) {
+        console.error('操作失败:', error)
+        ElMessage.error(dialogType.value === 'add' ? '添加失败' : '修改失败')
+      }
+    }
+  })
+}
+
+// 删除用户
+const handleDelete = (row: UserDTO) => {
+  ElMessageBox.confirm(
+    `确定要删除用户 ${row.username} 吗？`,
+    '提示',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }
+  ).then(async () => {
+    try {
+      await deleteUser(row.id)
+      ElMessage.success('删除成功')
       fetchUserList()
+    } catch (error) {
+      ElMessage.error('删除失败')
     }
-  })
-}
-
-// 重置密码
-const handleResetPassword = (row: any) => {
-  ElMessageBox.confirm(
-    `确定要重置用户 ${row.username} 的密码吗？`,
-    '提示',
-    {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
-    }
-  ).then(() => {
-    // TODO: 实现重置密码的接口调用
-    ElMessage.success('密码重置成功')
-  })
-}
-
-// 切换用户状态
-const handleToggleStatus = (row: any) => {
-  const action = row.status === 'active' ? '禁用' : '启用'
-  ElMessageBox.confirm(
-    `确定要${action}用户 ${row.username} 吗？`,
-    '提示',
-    {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
-    }
-  ).then(() => {
-    // TODO: 实现状态切换的接口调用
-    row.status = row.status === 'active' ? 'disabled' : 'active'
-    ElMessage.success(`${action}成功`)
   })
 }
 
 // 初始化
-fetchUserList()
+onMounted(() => {
+  fetchUserList()
+})
 </script>
 
 <style lang="scss" scoped>

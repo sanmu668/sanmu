@@ -88,7 +88,7 @@ const handleCommand = (command: string) => {
   height: 100vh;
   
   .el-aside {
-    background-color: #304156;
+    background-color: #EBF5FB;
     
     .logo {
       height: 60px;
@@ -97,7 +97,7 @@ const handleCommand = (command: string) => {
       justify-content: center;
       
       h3 {
-        color: #fff;
+        color: #2C3E50;
         margin: 0;
       }
     }
@@ -107,11 +107,19 @@ const handleCommand = (command: string) => {
       background-color: transparent;
       
       .el-menu-item {
-        color: #bfcbd9;
+        color: #34495E;
         
         &:hover, &.is-active {
-          color: #409EFF;
-          background-color: #263445;
+          color: #3498DB;
+          background-color: #D6EAF8;
+        }
+
+        .el-icon {
+          color: #34495E;
+        }
+
+        &:hover .el-icon, &.is-active .el-icon {
+          color: #3498DB;
         }
       }
     }

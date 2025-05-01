@@ -21,86 +21,21 @@ AI对话页    	可以与智能客服进行交互
 后端功能模块
 模块		功能		核心接口
 认证模块	登录注册、角色验证	/auth/*
+（在安全性方面，结合了 Spring Security 和 JWT (JSON Web Token) 实现了用户认证和授权，使用 BCrypt 加密算法保护用户密码安全。数据持久化层使用了 Spring Data JPA 配合 MySQL 数据库，提供高效的数据访问。系统通过 @CrossOrigin 注解和安全配置解决了跨域问题，使用 JWT 无状态令牌解决了分布式系统的会话管理问题，同时通过统一的异常处理机制提供了友好的错误响应。）
+
 简历管理	上传、编辑简历	/resume/*
 职位推荐	推荐岗位	/job/recommend
 投递记录	投递管理	/apply/*
 账号设置	头像、密码、通知设置	/user/*
-AI对话功能                                      /api/*
+AI对话功能                        /chat/*
+（AI简历优化与职业咨询服务，核心使用阿里云DashScope的通义千问(Qwen)大语言模型作为AI对话引擎，通过RESTful API提供服务。系统包含对话管理、历史记录存储、安全控制等功能模块，采用MySQL数据库持久化数据，并通过Spring Security实现接口访问控制。）
+
 用户管理（后台）	管理求职者	/admin/users
 简历查看（后台）	查看任意求职者简历	/admin/resume/*
 职位管理（后台）	岗位增删改查	/admin/job/*
 投递管理（后台）	查看+审核投递记录	/admin/applications
 数据统计（后台）	用户、岗位、投递数据统计	/admin/stats
 
-数据库设计
--- 用户表
-CREATE TABLE `user` (
-    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
-    `email` VARCHAR(255) NOT NULL UNIQUE,
-    `password` VARCHAR(255) NOT NULL,
-    `role` TINYINT NOT NULL DEFAULT 0,  -- 0=求职者, 1=HR, 2=管理员
-    `avatar` VARCHAR(255) DEFAULT NULL,
-    `status` TINYINT NOT NULL DEFAULT 0,  -- 0=正常, 1=封禁
-    `notification_enabled` BOOLEAN NOT NULL DEFAULT TRUE,
-    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 简历表
-CREATE TABLE `resume` (
-    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
-    `user_id` BIGINT NOT NULL,
-    `full_name` VARCHAR(255) NOT NULL,
-    `phone` VARCHAR(50) NOT NULL,
-    `location` VARCHAR(255) NOT NULL,
-    `education` TEXT NOT NULL,  -- JSON格式
-    `work_experience` TEXT NOT NULL,  -- JSON格式
-    `skills` TEXT NOT NULL,  -- JSON数组
-    `certificates` TEXT NOT NULL,  -- JSON数组
-    `attachment_url` VARCHAR(255) DEFAULT NULL,  -- PDF简历链接
-    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 职位表
-CREATE TABLE `job` (
-    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
-    `title` VARCHAR(255) NOT NULL,
-    `company` VARCHAR(255) NOT NULL,
-    `location` VARCHAR(255) NOT NULL,
-    `description` TEXT NOT NULL,
-    `requirements` TEXT NOT NULL,
-    `deadline` DATE NOT NULL,
-    `status` TINYINT NOT NULL DEFAULT 0,  -- 0=正常, 1=下架
-    `created_by` BIGINT NOT NULL,  -- HR用户ID
-    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (`created_by`) REFERENCES `user`(`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- 投递记录表
-CREATE TABLE `application` (
-    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
-    `user_id` BIGINT NOT NULL,
-    `job_id` BIGINT NOT NULL,
-    `resume_id` BIGINT NOT NULL,
-    `status` TINYINT NOT NULL DEFAULT 0,  -- 0=未读, 1=已读, 2=通过, 3=拒绝
-    `applied_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE,
-    FOREIGN KEY (`job_id`) REFERENCES `job`(`id`) ON DELETE CASCADE,
-    FOREIGN KEY (`resume_id`) REFERENCES `resume`(`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- AI对话记录表
-CREATE TABLE `ai_chat` (
-    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
-    `user_id` BIGINT NOT NULL,
-    `question` TEXT NOT NULL,
-    `answer` TEXT NOT NULL,
-    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- 数据统计表（可选，动态生成无需建表）
--- (不需要额外的表，数据统计可以通过聚合查询动态生成)
 

@@ -20,9 +20,13 @@
             <div v-for="resume in savedResumes" 
                  :key="resume.id" 
                  class="resume-item"
+                 :class="{ 'selected': selectedResumeId === resume.id }"
                  @click="selectResume(resume)">
               <el-icon><component :is="icons.document" /></el-icon>
               <span>{{ resume.name }}</span>
+              <el-icon class="operation-icon" @click.stop="handleResumeOperationClick($event, resume)">
+                <component :is="icons.more" />
+              </el-icon>
             </div>
           </div>
         </div>
@@ -33,14 +37,42 @@
             <div v-for="chat in chatHistory" 
                  :key="chat.id" 
                  class="chat-item"
+                 :class="{ 'selected': selectedChatId === chat.id }"
                  @click="loadChat(chat)">
               <el-icon><component :is="icons.chatRound" /></el-icon>
               <span>{{ chat.title }}</span>
+              <el-icon class="operation-icon" @click="handleOperationClick($event, chat)">
+                <component :is="icons.more" />
+              </el-icon>
             </div>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- 操作菜单 -->
+    <teleport to="body">
+      <div v-if="showOperationMenu" 
+           class="operation-menu"
+           :style="{
+             left: `${operationMenuPosition.x}px`,
+             top: `${operationMenuPosition.y}px`
+           }"
+      >
+        <div class="operation-menu-items">
+          <template v-if="currentItem">
+            <div class="operation-item" @click="handleRename(currentItem)">
+              <el-icon><component :is="icons.edit" /></el-icon>
+              <span>重命名</span>
+            </div>
+            <div class="operation-item delete" @click="handleDelete(currentItem)">
+              <el-icon><component :is="icons.delete" /></el-icon>
+              <span>删除</span>
+            </div>
+          </template>
+        </div>
+      </div>
+    </teleport>
 
     <div class="chat-window" :class="{ 'sidebar-collapsed': isSidebarCollapsed }">
       <div class="chat-header">
@@ -87,15 +119,37 @@
         </el-button>
       </div>
     </div>
+
+    <!-- 重命名对话框 -->
+    <el-dialog
+      v-model="isEditingName"
+      title="重命名"
+      width="300px"
+      :show-close="true"
+      :close-on-click-modal="false"
+      destroy-on-close
+    >
+      <el-input
+        v-model="editingName"
+        placeholder="请输入新名称"
+        @keyup.enter="saveRename"
+      />
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="isEditingName = false">取消</el-button>
+          <el-button type="primary" @click="saveRename">确定</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, onMounted, nextTick, onUnmounted, computed } from 'vue'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import { defineComponent } from 'vue'
-import { sendMessage as sendChatMessage, createNewSession as createNewChatSession } from '@/api/chat'
-import type { ChatMessage, ChatSession } from '@/types/chat'
+import { sendMessage as sendChatMessage, createNewSession as createNewChatSession, getChatHistory } from '@/api/chat'
+import type { ChatMessage, ChatSession } from '@/api/chat'
 import { ElMessage } from 'element-plus'
 
 // 注册所有图标组件
@@ -105,7 +159,10 @@ const icons = {
   document: ElementPlusIconsVue.Document,
   chatRound: ElementPlusIconsVue.ChatRound,
   user: ElementPlusIconsVue.User,
-  service: ElementPlusIconsVue.Service
+  service: ElementPlusIconsVue.Service,
+  more: ElementPlusIconsVue.MoreFilled,
+  edit: ElementPlusIconsVue.EditPen,
+  delete: ElementPlusIconsVue.Delete
 }
 
 interface Resume {
@@ -115,16 +172,31 @@ interface Resume {
 }
 
 interface SavedChat extends ChatSession {
+  id: string
   sessionId: string
+  title: string
+}
+
+interface LocalMessage extends ChatMessage {
+  content: string
+  time: string
 }
 
 const userInput = ref('')
 const loading = ref(false)
-const messages = ref<ChatMessage[]>([])
+const messages = ref<LocalMessage[]>([])
 const messagesContainer = ref<HTMLElement | null>(null)
 const isSidebarCollapsed = ref(false)
 const currentSessionId = ref<string>('')
 const currentChatTitle = ref<string>('')
+const userId = ref(1) // TODO: Get from user authentication
+const selectedResumeId = ref<number | null>(null)
+const selectedChatId = ref<string | null>(null)
+const showOperationMenu = ref(false)
+const operationMenuPosition = ref({ x: 0, y: 0 })
+const isEditingName = ref(false)
+const editingName = ref('')
+const editingItemType = ref<'resume' | 'chat' | null>(null)
 
 // Mock data for demonstration
 const savedResumes = ref<Resume[]>([
@@ -133,6 +205,9 @@ const savedResumes = ref<Resume[]>([
 ])
 
 const chatHistory = ref<SavedChat[]>([])
+
+const selectedChat = computed(() => chatHistory.value.find(c => c.id === selectedChatId.value))
+const selectedResume = computed(() => savedResumes.value.find(r => r.id === selectedResumeId.value))
 
 const toggleSidebar = () => {
   isSidebarCollapsed.value = !isSidebarCollapsed.value
@@ -145,11 +220,10 @@ const startNewChat = async () => {
       currentSessionId.value = response.sessionId
       currentChatTitle.value = ''
       messages.value = [{
-        id: response.id,
-        sessionId: response.sessionId,
-        content: response.content,
-        type: response.type,
-        time: formatTime()
+        ...response,
+        content: response.answer || '',
+        type: 'ai',
+        time: formatTimeFromTimestamp(response.timestamp)
       }]
     }
   } catch (error) {
@@ -159,29 +233,64 @@ const startNewChat = async () => {
 }
 
 const selectResume = (resume: Resume) => {
+  selectedResumeId.value = resume.id
+  selectedChatId.value = null
+  const timestamp = new Date().toISOString()
   messages.value = [{
+    id: Date.now(),
+    userId: userId.value,
+    sessionId: currentSessionId.value || '',
     content: `我将为您分析简历：${resume.name}，请稍等...`,
     type: 'ai',
-    time: formatTime()
+    time: formatTime(),
+    timestamp: timestamp
   }]
 }
 
 const loadChat = async (chat: SavedChat) => {
   try {
+    selectedChatId.value = chat.id
+    selectedResumeId.value = null
     currentSessionId.value = chat.sessionId
     currentChatTitle.value = chat.title
     
-    // 这里应该调用后端API获取历史消息
-    // const response = await getChatHistory(chat.sessionId)
-    // messages.value = response.messages
+    const response = await getChatHistory({
+      userId: userId.value,
+      sessionId: chat.sessionId
+    })
     
-    // 临时模拟加载消息
-    messages.value = [{
-      content: `已加载历史对话: ${chat.title}`,
-      type: 'ai',
-      time: formatTime()
-    }]
+    // 按时间戳排序消息
+    const sortedMessages = response.sort((a, b) => 
+      new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+    )
     
+    // 将每条记录转换为问题和回答两条消息
+    const allMessages: LocalMessage[] = []
+    
+    sortedMessages.forEach(msg => {
+      // 添加用户问题
+      if (msg.question) {
+        allMessages.push({
+          ...msg,
+          content: msg.question,
+          type: 'user',
+          time: formatTimeFromTimestamp(msg.timestamp)
+        })
+      }
+      
+      // 添加AI回答
+      if (msg.answer) {
+        allMessages.push({
+          ...msg,
+          content: msg.answer,
+          type: 'ai',
+          time: formatTimeFromTimestamp(msg.timestamp)
+        })
+      }
+    })
+    
+    messages.value = allMessages
+    await scrollToBottom()
   } catch (error) {
     ElMessage.error('加载历史对话失败')
     console.error('Error loading chat history:', error)
@@ -193,6 +302,14 @@ const formatTime = () => {
   const now = new Date()
   const hours = now.getHours().toString().padStart(2, '0')
   const minutes = now.getMinutes().toString().padStart(2, '0')
+  return `${hours}:${minutes}`
+}
+
+// 格式化时间戳
+const formatTimeFromTimestamp = (timestamp: string) => {
+  const date = new Date(timestamp)
+  const hours = date.getHours().toString().padStart(2, '0')
+  const minutes = date.getMinutes().toString().padStart(2, '0')
   return `${hours}:${minutes}`
 }
 
@@ -208,14 +325,18 @@ const scrollToBottom = async () => {
 const saveChatToHistory = () => {
   if (!currentSessionId.value || messages.value.length === 0) return
   
-  const lastMessage = messages.value[messages.value.length - 1]
-  const chatTitle = currentChatTitle.value || `对话 ${formatTime()}`
+  // 获取最后一组对话（用户问题和AI回答）
+  const lastUserMessage = messages.value.filter(m => m.type === 'user').pop()
+  const lastAiMessage = messages.value.filter(m => m.type === 'ai').pop()
+  
+  const chatTitle = currentChatTitle.value || 
+    (lastUserMessage ? lastUserMessage.content.slice(0, 20) + '...' : `对话 ${formatTime()}`)
   
   const savedChat: SavedChat = {
     id: Date.now().toString(),
     sessionId: currentSessionId.value,
     title: chatTitle,
-    lastMessage: lastMessage.content,
+    lastMessage: lastAiMessage?.content || lastUserMessage?.content || '',
     timestamp: formatTime()
   }
   
@@ -246,11 +367,18 @@ const handleSendMessage = async () => {
     await startNewChat()
   }
   
+  const timestamp = new Date().toISOString()
+  
   // 添加用户消息
-  const userMessage = {
+  const userMessage: LocalMessage = {
+    id: Date.now(),
+    userId: userId.value,
+    sessionId: currentSessionId.value,
     content: userInput.value,
-    type: 'user' as const,
-    time: formatTime()
+    question: userInput.value,
+    type: 'user',
+    time: formatTime(),
+    timestamp: timestamp
   }
   messages.value.push(userMessage)
   
@@ -265,18 +393,19 @@ const handleSendMessage = async () => {
   const tryRequest = async (): Promise<void> => {
     try {
       const response = await sendChatMessage({
-        message: userQuestion,
-        sessionId: currentSessionId.value
+        userId: userId.value,
+        sessionId: currentSessionId.value,
+        question: userQuestion
       })
       
       if (response) {
-        messages.value.push({
-          id: response.id,
-          sessionId: response.sessionId,
-          content: response.content,
-          type: response.type,
-          time: formatTime()
-        })
+        const aiMessage: LocalMessage = {
+          ...response,
+          content: response.answer || '',
+          type: 'ai',
+          time: formatTimeFromTimestamp(response.timestamp)
+        }
+        messages.value.push(aiMessage)
         
         // 保存对话到历史记录
         saveChatToHistory()
@@ -291,31 +420,35 @@ const handleSendMessage = async () => {
         return tryRequest() // 递归重试
       }
 
-      // 根据错误类型显示不同的错误消息
-      let errorMessage = '抱歉，服务出现了一些问题，请稍后再试。'
+      const errorTimestamp = new Date().toISOString()
+      const errorMessage: LocalMessage = {
+        id: Date.now(),
+        userId: userId.value,
+        sessionId: currentSessionId.value,
+        content: '抱歉，服务出现了一些问题，请稍后再试。',
+        type: 'ai',
+        time: formatTime(),
+        timestamp: errorTimestamp
+      }
+
       if (error.code === 'ECONNABORTED') {
-        errorMessage = '请求响应时间过长，请稍后重试。'
+        errorMessage.content = '请求响应时间过长，请稍后重试。'
       } else if (error.response) {
         switch (error.response.status) {
           case 401:
-            errorMessage = '会话已过期，请刷新页面重新开始对话。'
+            errorMessage.content = '会话已过期，请刷新页面重新开始对话。'
             break
           case 429:
-            errorMessage = '请求过于频繁，请稍后再试。'
+            errorMessage.content = '请求过于频繁，请稍后再试。'
             break
           case 500:
-            errorMessage = '服务器内部错误，请稍后重试。'
+            errorMessage.content = '服务器内部错误，请稍后重试。'
             break
         }
       }
 
-      messages.value.push({
-        content: errorMessage,
-        type: 'ai',
-        time: formatTime()
-      })
-      
-      ElMessage.error(errorMessage)
+      messages.value.push(errorMessage)
+      ElMessage.error(errorMessage.content)
     }
   }
 
@@ -327,10 +460,113 @@ const handleSendMessage = async () => {
   }
 }
 
+const handleResumeOperationClick = (event: MouseEvent, resume: Resume) => {
+  event.stopPropagation()
+  showOperationMenu.value = true
+  const rect = (event.target as HTMLElement).getBoundingClientRect()
+  operationMenuPosition.value = {
+    x: rect.right - 100, // 向左偏移菜单宽度
+    y: rect.top
+  }
+  selectedResumeId.value = resume.id
+  selectedChatId.value = null
+  editingItemType.value = 'resume'
+}
+
+const handleOperationClick = (event: MouseEvent, chat: SavedChat) => {
+  event.stopPropagation()
+  showOperationMenu.value = true
+  const rect = (event.target as HTMLElement).getBoundingClientRect()
+  operationMenuPosition.value = {
+    x: rect.right - 100, // 向左偏移菜单宽度
+    y: rect.top
+  }
+  selectedChatId.value = chat.id
+  selectedResumeId.value = null
+  editingItemType.value = 'chat'
+}
+
+const handleRename = async (item: Resume | SavedChat) => {
+  editingName.value = 'sessionId' in item ? item.title : item.name
+  isEditingName.value = true
+  editingItemType.value = 'sessionId' in item ? 'chat' : 'resume'
+  showOperationMenu.value = false
+}
+
+const saveRename = () => {
+  if (editingItemType.value === 'resume' && selectedResume.value) {
+    const index = savedResumes.value.findIndex(r => r.id === selectedResumeId.value)
+    if (index !== -1) {
+      savedResumes.value[index].name = editingName.value
+      localStorage.setItem('savedResumes', JSON.stringify(savedResumes.value))
+    }
+  } else if (editingItemType.value === 'chat' && selectedChat.value) {
+    const index = chatHistory.value.findIndex(c => c.id === selectedChatId.value)
+    if (index !== -1) {
+      chatHistory.value[index].title = editingName.value
+      localStorage.setItem('chatHistory', JSON.stringify(chatHistory.value))
+    }
+  }
+  isEditingName.value = false
+  editingName.value = ''
+  editingItemType.value = null
+}
+
+const handleDelete = async (item: Resume | SavedChat) => {
+  if ('id' in item) { // SavedChat
+    const index = chatHistory.value.findIndex(c => c.id === item.id)
+    if (index !== -1) {
+      chatHistory.value.splice(index, 1)
+      localStorage.setItem('chatHistory', JSON.stringify(chatHistory.value))
+      if (selectedChatId.value === item.id) {
+        selectedChatId.value = null
+        await startNewChat()
+      }
+    }
+  } else { // Resume
+    const index = savedResumes.value.findIndex(r => r.id === item.id)
+    if (index !== -1) {
+      savedResumes.value.splice(index, 1)
+      localStorage.setItem('savedResumes', JSON.stringify(savedResumes.value))
+      if (selectedResumeId.value === item.id) {
+        selectedResumeId.value = null
+      }
+    }
+  }
+  showOperationMenu.value = false
+}
+
+// Close operation menu when clicking outside
+const handleClickOutside = (event: MouseEvent) => {
+  const target = event.target as HTMLElement
+  if (!target.closest('.operation-menu') && !target.closest('.operation-icon')) {
+    showOperationMenu.value = false
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
+
 // 在组件挂载时加载历史对话
 onMounted(async () => {
   loadChatHistory()
   await startNewChat()
+})
+
+// 添加计算属性
+const currentItem = computed(() => {
+  if (editingItemType.value === 'chat' && selectedChat.value) {
+    return selectedChat.value
+  }
+  if (editingItemType.value === 'resume' && selectedResume.value) {
+    return selectedResume.value
+  }
+  return null
 })
 </script>
 
@@ -402,9 +638,18 @@ onMounted(async () => {
         margin-bottom: 8px;
         border-radius: 4px;
         cursor: pointer;
+        position: relative;
         
         &:hover {
           background: #f5f7fa;
+          
+          .operation-icon {
+            display: block;
+          }
+        }
+        
+        &.selected {
+          background: #f0f2f5;
         }
         
         .el-icon {
@@ -417,6 +662,21 @@ onMounted(async () => {
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
+        }
+
+        .operation-icon {
+          display: none;
+          position: absolute;
+          right: 8px;
+          color: #909399;
+          cursor: pointer;
+          padding: 2px;
+          border-radius: 3px;
+          
+          &:hover {
+            color: #409EFF;
+            background-color: rgba(64, 158, 255, 0.1);
+          }
         }
       }
     }
@@ -599,6 +859,46 @@ onMounted(async () => {
     .el-icon {
       font-size: 20px;
       color: white;
+    }
+  }
+}
+
+.operation-menu {
+  position: fixed;
+  background: white;
+  border-radius: 4px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  min-width: 100px;
+  padding: 4px 0;
+  margin: 0;
+  z-index: 2000;
+
+  .operation-menu-items {
+    .operation-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      cursor: pointer;
+      white-space: nowrap;
+      font-size: 13px;
+      transition: all 0.3s;
+      
+      &:hover {
+        background: #f5f7fa;
+      }
+      
+      .el-icon {
+        font-size: 14px;
+      }
+      
+      &.delete {
+        color: #f56c6c;
+        
+        &:hover {
+          background: #fef0f0;
+        }
+      }
     }
   }
 }

@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
  */
 @Configuration
 public class PasswordEncoderConfig {
+    //哈希加密
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();

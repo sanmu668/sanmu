@@ -79,3 +79,18 @@ create table user_cache(
     cache_expiry timestamp not null ,    #  缓存过期时间
     foreign key (user_id) references users(id) on delete cascade
 );
+
+#修改user_id字段类型为BIGINT
+alter table chat_message modify column  user_id int not null ;
+
+#删除旧的外键约束
+# alter table chat_message drop foreign key chat_message_ibfk_1;
+
+#添加新外键约束
+alter table chat_message add constraint fk_chat_message_user foreign key (user_id) references users(id) on delete cascade ;
+
+ALTER TABLE users ADD COLUMN username VARCHAR(100) NOT NULL AFTER id;
+
+ALTER TABLE users ADD COLUMN photo LONGBLOB AFTER password_hash;
+
+ALTER TABLE users ADD COLUMN number CHAR(11) NOT NULL  AFTER photo;

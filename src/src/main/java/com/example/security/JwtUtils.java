@@ -11,7 +11,12 @@ import java.util.Date;
 public class JwtUtils {
     private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
-    // 生成 Token，包含 email 和角色
+    /**
+     * 生成JWT令牌
+     * @param email 用户邮箱，用于标识令牌所有者
+     * @param role 用户角色，用于赋予令牌相应权限
+     * @return 生成的JWT令牌字符串
+     */
     public String genrateToken(String email, String role) {
         return Jwts.builder()
                 .setSubject(email)
@@ -22,22 +27,18 @@ public class JwtUtils {
                 .compact();
     }
 
-    // 获取 Claims
+    /**
+     * 从指定的令牌中获取Clains（声明）对象
+     * 该方法主要用于解析JWT令牌，并提取出其中的声明信息
+     *
+     * @param token 需要解析的JWT令牌字符串
+     * @return 解析后的Claims对象，包含令牌中的各种声明信息
+     */
     public Claims getClaimsFromToken(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-    }
-
-    // 获取 email
-    public String getEmailFromToken(String token) {
-        return getClaimsFromToken(token).getSubject();
-    }
-
-    // 获取 role
-    public String getRoleFromToken(String token) {
-        return getClaimsFromToken(token).get("role", String.class);
     }
 }
