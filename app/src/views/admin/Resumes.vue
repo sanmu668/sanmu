@@ -61,9 +61,23 @@
 import { ref, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
+import axios from 'axios'
+
+// Configure axios base URL
+axios.defaults.baseURL = 'http://localhost:8080'
+
+interface Resume {
+  id: number
+  userName: string | null
+  title: string
+  education: string | null
+  experience: string | null
+  status: string | null
+  updateTime: string
+}
 
 // 表格数据
-const resumes = ref([])
+const resumes = ref<Resume[]>([])
 const loading = ref(false)
 const currentPage = ref(1)
 const pageSize = ref(10)
@@ -74,18 +88,15 @@ const searchQuery = ref('')
 const fetchResumes = async () => {
   loading.value = true
   try {
-    // TODO: 替换为实际的API调用
-    const mockData = Array.from({ length: 10 }, (_, index) => ({
-      id: index + 1,
-      userName: `user${index + 1}`,
-      title: `前端开发工程师简历${index + 1}`,
-      education: '本科',
-      experience: '3年',
-      status: index % 2 === 0 ? 'active' : 'draft',
-      updateTime: new Date().toLocaleString()
-    }))
-    resumes.value = mockData
-    total.value = 100
+    const response = await axios.get(`/api/admin/resumes`, {
+      params: {
+        page: currentPage.value , 
+        size: pageSize.value,
+        query: searchQuery.value || undefined
+      }
+    })
+    resumes.value = response.data.content
+    total.value = response.data.totalElements || response.data.content.length
   } catch (error) {
     ElMessage.error('获取简历列表失败')
   } finally {
@@ -100,17 +111,56 @@ const handleSearch = () => {
 }
 
 // 查看简历
-const handleView = (row: any) => {
-  ElMessage.info('查看简历功能开发中')
+const handleView = (row: Resume) => {
+  const pdfUrl = `${axios.defaults.baseURL}/api/admin/resumes/pdf/${row.id}`
+  try {
+    // For PDF files, we should use an iframe or embed element for better viewing experience
+    const width = 850
+    const height = 600
+    const left = (window.screen.width / 2) - (width / 2)
+    const top = (window.screen.height / 2) - (height / 2)
+    
+    window.open(
+      pdfUrl,
+      '_blank',
+      `toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=yes, copyhistory=no, width=${width}, height=${height}, top=${top}, left=${left}`
+    )
+  } catch (error) {
+    ElMessage.error('打开PDF失败')
+  }
 }
 
 // 下载简历
-const handleDownload = (row: any) => {
-  ElMessage.info('下载简历功能开发中')
+const handleDownload = async (row: Resume) => {
+  try {
+    const response = await axios.get(`/api/admin/resumes/${row.id}/download`, {
+      responseType: 'blob'
+    })
+    
+    // Check if we got a valid response
+    if (!(response.data instanceof Blob)) {
+      throw new Error('Invalid response format')
+    }
+    
+    // 创建下载链接
+    const url = window.URL.createObjectURL(new Blob([response.data]))
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', `${row.title || 'resume'}.pdf`) // Add fallback name
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(url)
+    
+    ElMessage.success('下载成功')
+  } catch (error) {
+    console.error('Download error:', error)
+    ElMessage.error(error instanceof Error ? error.message : '下载失败，请稍后重试')
+  }
 }
 
 // 删除简历
-const handleDelete = (row: any) => {
+const handleDelete = (row: Resume) => {
   ElMessageBox.confirm(
     '确定要删除该简历吗？',
     '警告',
@@ -119,8 +169,14 @@ const handleDelete = (row: any) => {
       cancelButtonText: '取消',
       type: 'warning',
     }
-  ).then(() => {
-    ElMessage.success('删除成功')
+  ).then(async () => {
+    try {
+      await axios.delete(`/api/admin/resumes/${row.id}`)
+      ElMessage.success('删除成功')
+      fetchResumes() // 重新加载列表
+    } catch (error) {
+      ElMessage.error('删除失败')
+    }
   }).catch(() => {})
 }
 

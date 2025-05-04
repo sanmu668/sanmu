@@ -15,18 +15,59 @@
       
       <div class="sidebar-content">
         <div class="sidebar-section">
-          <h3>简历分析</h3>
+          <div class="section-header">
+            <h3>简历分析</h3>
+            <el-upload
+              class="upload-btn"
+              :action="uploadUrl"
+              :before-upload="handleBeforeUpload"
+              :on-success="handleUploadSuccess"
+              :on-error="handleUploadError"
+              :show-file-list="false"
+              accept=".pdf"
+            >
+              <el-button type="primary" link>
+                <el-icon><component :is="icons.upload" /></el-icon>
+                上传简历
+              </el-button>
+            </el-upload>
+          </div>
           <div class="resume-list">
-            <div v-for="resume in savedResumes" 
+            <div v-for="resume in resumes" 
                  :key="resume.id" 
                  class="resume-item"
-                 :class="{ 'selected': selectedResumeId === resume.id }"
-                 @click="selectResume(resume)">
+                 :class="{ 
+                   'selected': selectedResumeId === resume.id,
+                   'analyzing': resume.status === 'analyzing',
+                   'error': resume.status === 'error'
+                 }"
+                 @click="selectResume(resume, $event)"
+                 draggable="true"
+                 @dragstart="handleDragStart($event, resume)">
               <el-icon><component :is="icons.document" /></el-icon>
-              <span>{{ resume.name }}</span>
+              <div class="resume-info">
+                <span class="resume-name">{{ resume.name }}</span>
+                <span class="resume-meta">
+                  {{ formatFileSize(resume.fileSize) }} · {{ formatTime(resume.uploadTime) }}
+                </span>
+              </div>
+              <el-icon 
+                v-if="resume.status === 'analyzing'"
+                class="status-icon loading">
+                <component :is="icons.loading" />
+              </el-icon>
+              <el-icon 
+                v-else-if="resume.status === 'error'"
+                class="status-icon error">
+                <component :is="icons.warning" />
+              </el-icon>
               <el-icon class="operation-icon" @click.stop="handleResumeOperationClick($event, resume)">
                 <component :is="icons.more" />
               </el-icon>
+            </div>
+            <div v-if="resumes.length === 0" class="empty-tip">
+              <el-icon><component :is="icons.document" /></el-icon>
+              <p>暂无简历，请上传PDF格式的简历文件</p>
             </div>
           </div>
         </div>
@@ -109,6 +150,11 @@
           resize="none"
           placeholder="请输入您的问题..."
           @keyup.enter.exact.prevent="handleSendMessage"
+          @drop.prevent="handleDrop"
+          @dragover.prevent="handleDragOver"
+          @dragenter="handleDragEnter"
+          @dragleave="handleDragLeave"
+          :class="{ 'drag-over': isDragOver }"
         />
         <el-button 
           type="primary" 
@@ -141,6 +187,35 @@
         </span>
       </template>
     </el-dialog>
+
+    <!-- PDF预览对话框 -->
+    <el-dialog
+      v-model="showPdfPreview"
+      :title="selectedResume?.name"
+      width="80%"
+      :fullscreen="true"
+      destroy-on-close
+    >
+      <div class="pdf-container">
+        <vue-pdf-embed
+          v-if="selectedResume?.url"
+          :source="selectedResume.url"
+          :page="currentPage"
+          @rendered="handlePdfRendered"
+        />
+        <div class="pdf-controls">
+          <el-button-group>
+            <el-button @click="currentPage--" :disabled="currentPage <= 1">
+              上一页
+            </el-button>
+            <el-button>{{ currentPage }} / {{ totalPages }}</el-button>
+            <el-button @click="currentPage++" :disabled="currentPage >= totalPages">
+              下一页
+            </el-button>
+          </el-button-group>
+        </div>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -151,12 +226,18 @@ import { defineComponent } from 'vue'
 import { sendMessage as sendChatMessage, createNewSession as createNewChatSession, getChatHistory } from '@/api/chat'
 import type { ChatMessage, ChatSession } from '@/api/chat'
 import { ElMessage } from 'element-plus'
+import VuePdfEmbed from 'vue-pdf-embed'
+import type { Resume } from '@/api/resume'
+import { getResumeList, uploadResume, deleteResume, getResumeAnalysis } from '@/api/resume'
 
 // 注册所有图标组件
 const icons = {
   plus: ElementPlusIconsVue.Plus,
   fold: ElementPlusIconsVue.Fold,
   document: ElementPlusIconsVue.Document,
+  upload: ElementPlusIconsVue.Upload,
+  loading: ElementPlusIconsVue.Loading,
+  warning: ElementPlusIconsVue.Warning,
   chatRound: ElementPlusIconsVue.ChatRound,
   user: ElementPlusIconsVue.User,
   service: ElementPlusIconsVue.Service,
@@ -165,16 +246,12 @@ const icons = {
   delete: ElementPlusIconsVue.Delete
 }
 
-interface Resume {
-  id: number
-  name: string
-  content: string
-}
-
 interface SavedChat extends ChatSession {
   id: string
   sessionId: string
   title: string
+  lastMessage?: string
+  timestamp: string
 }
 
 interface LocalMessage extends ChatMessage {
@@ -198,16 +275,19 @@ const isEditingName = ref(false)
 const editingName = ref('')
 const editingItemType = ref<'resume' | 'chat' | null>(null)
 
-// Mock data for demonstration
-const savedResumes = ref<Resume[]>([
-  { id: 1, name: '我的简历_2024', content: '' },
-  { id: 2, name: '技术简历_最新', content: '' },
-])
+// PDF预览相关
+const showPdfPreview = ref(false)
+const currentPage = ref(1)
+const totalPages = ref(1)
 
+// 状态变量
+const resumes = ref<Resume[]>([])
 const chatHistory = ref<SavedChat[]>([])
+const uploadUrl = import.meta.env.VITE_API_BASE_URL + '/api/resumes/upload'
+const isUploading = ref(false)
 
-const selectedChat = computed(() => chatHistory.value.find(c => c.id === selectedChatId.value))
-const selectedResume = computed(() => savedResumes.value.find(r => r.id === selectedResumeId.value))
+const selectedChat = computed(() => chatHistory.value.find((c: SavedChat) => c.id === selectedChatId.value))
+const selectedResume = computed(() => resumes.value.find(r => r.id === selectedResumeId.value))
 
 const toggleSidebar = () => {
   isSidebarCollapsed.value = !isSidebarCollapsed.value
@@ -232,9 +312,16 @@ const startNewChat = async () => {
   }
 }
 
-const selectResume = (resume: Resume) => {
+const selectResume = (resume: Resume, event?: MouseEvent) => {
+  if (event?.detail === 2) { // 双击
+    showPdfPreview.value = true
+    currentPage.value = 1
+    return
+  }
+  
   selectedResumeId.value = resume.id
   selectedChatId.value = null
+  
   const timestamp = new Date().toISOString()
   messages.value = [{
     id: Date.now(),
@@ -495,10 +582,10 @@ const handleRename = async (item: Resume | SavedChat) => {
 
 const saveRename = () => {
   if (editingItemType.value === 'resume' && selectedResume.value) {
-    const index = savedResumes.value.findIndex(r => r.id === selectedResumeId.value)
+    const index = resumes.value.findIndex(r => r.id === selectedResumeId.value)
     if (index !== -1) {
-      savedResumes.value[index].name = editingName.value
-      localStorage.setItem('savedResumes', JSON.stringify(savedResumes.value))
+      resumes.value[index].name = editingName.value
+      localStorage.setItem('savedResumes', JSON.stringify(resumes.value))
     }
   } else if (editingItemType.value === 'chat' && selectedChat.value) {
     const index = chatHistory.value.findIndex(c => c.id === selectedChatId.value)
@@ -524,10 +611,10 @@ const handleDelete = async (item: Resume | SavedChat) => {
       }
     }
   } else { // Resume
-    const index = savedResumes.value.findIndex(r => r.id === item.id)
+    const index = resumes.value.findIndex(r => r.id === item.id)
     if (index !== -1) {
-      savedResumes.value.splice(index, 1)
-      localStorage.setItem('savedResumes', JSON.stringify(savedResumes.value))
+      resumes.value.splice(index, 1)
+      localStorage.setItem('savedResumes', JSON.stringify(resumes.value))
       if (selectedResumeId.value === item.id) {
         selectedResumeId.value = null
       }
@@ -568,6 +655,120 @@ const currentItem = computed(() => {
   }
   return null
 })
+
+const handlePdfRendered: (numPages: number) => void = (numPages) => {
+  totalPages.value = numPages
+}
+
+// 添加拖拽相关功能
+const handleDragStart = (event: DragEvent, resume: Resume) => {
+  if (event.dataTransfer) {
+    event.dataTransfer.setData('text/plain', JSON.stringify(resume))
+    event.dataTransfer.effectAllowed = 'copy'
+  }
+}
+
+// 拖拽状态
+const isDragOver = ref(false)
+
+const handleDragEnter = (event: DragEvent) => {
+  event.preventDefault()
+  isDragOver.value = true
+}
+
+const handleDragLeave = (event: DragEvent) => {
+  event.preventDefault()
+  isDragOver.value = false
+}
+
+// 修改 handleDrop 函数
+const handleDrop = (event: DragEvent) => {
+  event.preventDefault()
+  isDragOver.value = false
+  const data = event.dataTransfer?.getData('text/plain')
+  if (data) {
+    try {
+      const resume = JSON.parse(data) as Resume
+      userInput.value = `请分析这份简历：${resume.name}`
+    } catch (error) {
+      console.error('Invalid resume data:', error)
+    }
+  }
+}
+
+// 修改 handleDragOver 函数
+const handleDragOver = (event: DragEvent) => {
+  event.preventDefault()
+  if (event.dataTransfer) {
+    event.dataTransfer.dropEffect = 'copy'
+  }
+}
+
+// 格式化文件大小
+const formatFileSize = (bytes: number) => {
+  if (bytes === 0) return '0 B'
+  const k = 1024
+  const sizes = ['B', 'KB', 'MB', 'GB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i]
+}
+
+// 格式化上传时间
+const formatUploadTime = (time: string) => {
+  const date = new Date(time)
+  const now = new Date()
+  const diff = now.getTime() - date.getTime()
+  
+  // 如果是今天的文件，只显示时间
+  if (date.toDateString() === now.toDateString()) {
+    return date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+  }
+  
+  // 如果是最近7天的文件，显示周几
+  if (diff < 7 * 24 * 60 * 60 * 1000) {
+    const days = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
+    return days[date.getDay()]
+  }
+  
+  // 其他情况显示完整日期
+  return date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' })
+}
+
+// 上传相关方法
+const handleBeforeUpload = (file: File) => {
+  if (file.type !== 'application/pdf') {
+    ElMessage.error('只能上传PDF格式的文件')
+    return false
+  }
+  if (file.size / 1024 / 1024 > 10) {
+    ElMessage.error('文件大小不能超过10MB')
+    return false
+  }
+  isUploading.value = true
+  return true
+}
+
+const handleUploadSuccess = async (response: any) => {
+  isUploading.value = false
+  ElMessage.success('上传成功')
+  await loadResumeList()
+}
+
+const handleUploadError = () => {
+  isUploading.value = false
+  ElMessage.error('上传失败，请重试')
+}
+
+// 加载简历列表
+const loadResumeList = async () => {
+  try {
+    const response = await getResumeList()
+    resumes.value = response.data
+  } catch (error) {
+    console.error('Error loading resumes:', error)
+    ElMessage.error('加载简历列表失败')
+  }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -796,6 +997,16 @@ const currentItem = computed(() => {
       
       .el-textarea {
         flex: 1;
+        
+        :deep(.el-textarea__inner) {
+          transition: all 0.3s;
+          
+          &.drag-over {
+            border-color: #409EFF;
+            border-style: dashed;
+            background-color: rgba(64, 158, 255, 0.1);
+          }
+        }
       }
       
       .el-button {
@@ -900,6 +1111,125 @@ const currentItem = computed(() => {
         }
       }
     }
+  }
+}
+
+.resume-item {
+  cursor: grab;
+  
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.pdf-container {
+  height: calc(100vh - 200px);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  
+  :deep(iframe) {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+  
+  .pdf-controls {
+    display: flex;
+    justify-content: center;
+    padding: 16px;
+    background: white;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  
+  h3 {
+    margin: 0;
+    font-size: 14px;
+    color: #909399;
+  }
+}
+
+.resume-list {
+  .resume-item {
+    &.analyzing {
+      background-color: rgba(64, 158, 255, 0.1);
+      
+      .status-icon {
+        animation: rotating 2s linear infinite;
+      }
+    }
+    
+    &.error {
+      background-color: rgba(245, 108, 108, 0.1);
+      
+      .status-icon {
+        color: #f56c6c;
+      }
+    }
+    
+    .resume-info {
+      flex: 1;
+      min-width: 0;
+      
+      .resume-name {
+        display: block;
+        font-size: 14px;
+        color: #303133;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      
+      .resume-meta {
+        display: block;
+        font-size: 12px;
+        color: #909399;
+      }
+    }
+    
+    .status-icon {
+      margin-right: 8px;
+      font-size: 16px;
+      color: #409EFF;
+    }
+  }
+  
+  .empty-tip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px;
+    color: #909399;
+    
+    .el-icon {
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+    
+    p {
+      margin: 0;
+      font-size: 14px;
+    }
+  }
+}
+
+@keyframes rotating {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
 </style> 

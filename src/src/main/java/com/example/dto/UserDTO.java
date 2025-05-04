@@ -36,4 +36,8 @@ public class UserDTO {
             this.photoBase64 = Base64.getEncoder().encodeToString(photo);
         }
     }
+
+    public UserDTO() {
+
+    }
 }

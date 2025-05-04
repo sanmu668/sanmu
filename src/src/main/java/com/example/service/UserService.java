@@ -8,6 +8,9 @@ import java.util.Optional;
 
 public interface UserService {
     User saveUser(User user);
+
+    UserDTO updateUser(Integer id, UserDTO userDTO);
+
     void deleteUser(Integer id);
 
     List<UserDTO> getAllUsers();

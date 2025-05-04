@@ -26,8 +26,8 @@ const adminRoutes: RouteRecordRaw[] = [
       },
       {
         path: 'resumes',
-        name: 'ResumeManagement',
-        component: () => import('@/views/admin/ResumeManagement.vue'),
+        name: 'Resumes',
+        component: () => import('@/views/admin/Resumes.vue'),
         meta: {
           title: '简历管理',
           icon: 'Document'
@@ -45,7 +45,7 @@ const adminRoutes: RouteRecordRaw[] = [
       {
         path: 'applications',
         name: 'ApplicationManagement',
-        component: () => import('@/views/admin/ApplicationManagement.vue'),
+        component: () => import('@/views/admin/Applications.vue'),
         meta: {
           title: '投递管理',
           icon: 'List'

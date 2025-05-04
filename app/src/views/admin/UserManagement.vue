@@ -144,7 +144,7 @@ import type { Ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
-import { createUser, getAllUsers, deleteUser, getUserByUsername, getUserByEmail } from '@/api/userService'
+import { createUser, getAllUsers, deleteUser, getUserByUsername, getUserByEmail, updateUser } from '@/api/userService'
 import type { User, UserDTO } from '@/types/user'
 
 // 搜索表单
@@ -288,6 +288,7 @@ const handleEdit = (row: UserDTO) => {
   dialogType.value = 'edit'
   dialogVisible.value = true
   Object.assign(userForm, {
+    id: row.id,
     username: row.username,
     email: row.email,
     number: row.number
@@ -316,7 +317,13 @@ const handleSubmit = async () => {
           await createUser(newUser)
           ElMessage.success('添加成功')
         } else {
-          // TODO: 实现编辑用户的接口调用
+          const updateData = {
+            username: userForm.username,
+            email: userForm.email,
+            number: userForm.number,
+            updateAt: new Date().toISOString()
+          }
+          await updateUser(userForm.id!, updateData)
           ElMessage.success('修改成功')
         }
         dialogVisible.value = false

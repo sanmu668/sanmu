@@ -27,6 +27,11 @@ public class UserController {
         return userService.saveUser(user);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<UserDTO> updataUser(@PathVariable Integer id,@RequestBody UserDTO userDTO){
+        return ResponseEntity.ok(userService.updateUser(id,userDTO));
+    }
+
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Integer id){
         userService.deleteUser(id);

@@ -24,7 +24,10 @@
       "@/*": [
         "src/*"
       ]
-    }
+    },
+    "types": [
+      "vue-pdf-embed"
+    ]
   },
   "include": [
     "src/**/*.ts",

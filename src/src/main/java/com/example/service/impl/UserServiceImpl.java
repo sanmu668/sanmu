@@ -3,15 +3,14 @@ package com.example.service.impl;
 import com.example.dto.UserDTO;
 import com.example.entity.User;
 import com.example.repository.UserRepository;
-import com.example.security.PasswordEncoderConfig;
 import com.example.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+
 
 /**
  * @author wzs
@@ -32,6 +31,25 @@ public class UserServiceImpl implements UserService {
             user.setPasswordHash(passwordEncoder.encode(user.getPasswordHash()));
         }
         return userRepository.save(user);
+    }
+
+    @Override
+    public UserDTO updateUser(Integer id, UserDTO userDTO){
+        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        user.setUsername(userDTO.getUsername());
+        user.setEmail(userDTO.getEmail());
+        user.setNumber(userDTO.getNumber());
+        userRepository.save(user);
+        return convertToDTO(user);
+    }
+
+    private UserDTO convertToDTO(User user) {
+        UserDTO dto = new UserDTO();
+        dto.setId(user.getId());
+        dto.setUsername(user.getUsername());
+        dto.setEmail(user.getEmail());
+        dto.setNumber(user.getNumber());
+        return dto;
     }
 
     @Override

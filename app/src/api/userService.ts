@@ -44,3 +44,11 @@ export const getUserByEmail = (email: string) => {
     method: 'get'
   })
 } 
+
+export const updateUser = (id: number, user: Partial<User>) => {
+  return request<User>({
+    url: `/user/${id}`,
+    method: 'put',
+    data: user
+  })
+}
