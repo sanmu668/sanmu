@@ -192,39 +192,79 @@ const userFormRules: FormRules = {
   ]
 }
 
+// 获取用户列表
+const fetchUserList = async () => {
+  loading.value = true
+  try {
+    const axiosResponse = await getAllUsers({
+      page: currentPage.value,
+      size: pageSize.value
+    })
+    
+    console.log('Full Axios Response:', axiosResponse) // Debug full response
+    
+    // 检查响应结构
+    if (!axiosResponse) {
+      console.error('No response received')
+      userList.value = []
+      total.value = 0
+      return
+    }
+
+    // 使用响应数据
+    const response = axiosResponse.data || axiosResponse
+    console.log('Processed Response:', response) // Debug processed response
+    
+    if (response?.content) {
+      userList.value = response.content
+      total.value = response.totalElements
+    } else {
+      userList.value = []
+      total.value = 0
+      console.error('Invalid response format:', response)
+    }
+  } catch (error) {
+    console.error('获取用户列表失败:', error)
+    ElMessage.error('获取用户列表失败')
+    userList.value = []
+    total.value = 0
+  } finally {
+    loading.value = false
+  }
+}
+
 // 搜索处理
 const handleSearch = async () => {
   loading.value = true
   try {
-    let data
-    if (searchForm.username) {
-      data = await getUserByUsername(searchForm.username)
-      if (Array.isArray(data)) {
-        userList.value = data
-        total.value = data.length
-      } else {
-        userList.value = []
-        total.value = 0
-      }
-    } else if (searchForm.email) {
-      data = await getUserByEmail(searchForm.email)
-      // 邮箱搜索返回单个对象
-      if (data) {
-        userList.value = [data]
-        total.value = 1
-      } else {
-        userList.value = []
-        total.value = 0
-      }
+    const axiosResponse = await getAllUsers({
+      username: searchForm.username,
+      email: searchForm.email,
+      page: currentPage.value,
+      size: pageSize.value
+    })
+    
+    console.log('Full Search Response:', axiosResponse) // Debug full response
+    
+    // 检查响应结构
+    if (!axiosResponse) {
+      console.error('No search response received')
+      userList.value = []
+      total.value = 0
+      return
+    }
+
+    // 使用响应数据
+    const response = axiosResponse.data || axiosResponse
+    console.log('Processed Search Response:', response) // Debug processed response
+    
+    if (response?.content) {
+      userList.value = response.content
+      total.value = response.totalElements
     } else {
-      data = await getAllUsers()
-      if (Array.isArray(data)) {
-        userList.value = data
-        total.value = data.length
-      } else {
-        userList.value = []
-        total.value = 0
-      }
+      userList.value = []
+      total.value = 0
+      console.error('Invalid search response format:', response)
     }
   } catch (error) {
     console.error('搜索失败:', error)
@@ -240,37 +280,20 @@ const handleSearch = async () => {
 const resetSearch = () => {
   searchForm.username = ''
   searchForm.email = ''
+  currentPage.value = 1
   handleSearch()
 }
 
 // 分页处理
 const handleSizeChange = (val: number) => {
   pageSize.value = val
-  fetchUserList()
+  currentPage.value = 1
+  handleSearch()
 }
 
 const handleCurrentChange = (val: number) => {
   currentPage.value = val
-  fetchUserList()
-}
-
-// 获取用户列表
-const fetchUserList = async () => {
-  loading.value = true
-  try {
-    const response = await getAllUsers()
-    if (Array.isArray(response)) {
-      userList.value = response
-      total.value = response.length
-    } else {
-      ElMessage.error('获取用户列表数据格式错误')
-    }
-  } catch (error) {
-    console.error('获取用户列表失败:', error)
-    ElMessage.error('获取用户列表失败')
-  } finally {
-    loading.value = false
-  }
+  handleSearch()
 }
 
 // 新增用户

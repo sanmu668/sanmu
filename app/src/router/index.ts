@@ -42,6 +42,12 @@ const frontendRoutes: RouteRecordRaw[] = [
         name: 'Settings',
         component: () => import('@/views/frontend/Settings.vue'),
         meta: { title: '账号设置', requiresAuth: true }
+      },
+      {
+        path: 'resumeModel/:resumeid?',
+        name: 'ResumeModel',
+        component: () => import('@/views/frontend/resumeModel.vue'),
+        meta: { title: '简历模板', requiresAuth: true }
       }
     ]
   }
@@ -110,11 +116,24 @@ const router = createRouter({
 
 // 路由守卫
 router.beforeEach((to, from, next) => {
+  console.log('Navigation guard triggered')
+  console.log('From:', from.path)
+  console.log('To:', to.path)
+  console.log('Route meta:', to.meta)
+  console.log('Route params:', to.params)
+  console.log('Route query:', to.query)
+  console.log('Auth required:', to.meta.requiresAuth)
+
   const userInfo = localStorage.getItem('userInfo')
   const token = localStorage.getItem('token')
 
+  console.log('User info exists:', !!userInfo)
+  console.log('Token exists:', !!token)
+  console.log('User info:', userInfo)
+
   // 检查是否需要登录
   if (to.meta.requiresAuth && (!userInfo || !token)) {
+    console.log('Auth required but not logged in, redirecting to login')
     next('/login')
     return
   }
@@ -123,11 +142,13 @@ router.beforeEach((to, from, next) => {
   if (to.meta.isAdmin) {
     const user = JSON.parse(userInfo || '{}')
     if (user.role !== 'admin') {
+      console.log('Admin required but user is not admin, redirecting to home')
       next('/')
       return
     }
   }
 
+  console.log('Navigation allowed')
   next()
 })
 

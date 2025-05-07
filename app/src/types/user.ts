@@ -16,4 +16,22 @@ export interface UserDTO extends Omit<User, 'passwordHash'> {
   id: number
   photoBase64: string | null
   createdAt: string
+}
+
+export interface UserQueryParams {
+  username?: string
+  email?: string
+  page?: number
+  size?: number
+}
+
+export interface PageResponse<T> {
+  content: T[]
+  totalElements: number
+  totalPages: number
+  size: number
+  number: number
+  first: boolean
+  last: boolean
+  empty: boolean
 } 

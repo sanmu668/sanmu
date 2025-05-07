@@ -5,12 +5,12 @@
         <div class="card-header">
           <span>投递记录</span>
           <el-radio-group v-model="status" size="small">
-            <el-radio-button label="all">全部</el-radio-button>
-            <el-radio-button label="pending">待处理</el-radio-button>
-            <el-radio-button label="reviewing">审核中</el-radio-button>
-            <el-radio-button label="interview">面试中</el-radio-button>
-            <el-radio-button label="offer">已录用</el-radio-button>
-            <el-radio-button label="rejected">已拒绝</el-radio-button>
+            <el-radio-button value="all">全部</el-radio-button>
+            <el-radio-button value="pending">待处理</el-radio-button>
+            <el-radio-button value="reviewing">审核中</el-radio-button>
+            <el-radio-button value="interview">面试中</el-radio-button>
+            <el-radio-button value="offer">已录用</el-radio-button>
+            <el-radio-button value="rejected">已拒绝</el-radio-button>
           </el-radio-group>
         </div>
       </template>
@@ -37,24 +37,29 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="150" fixed="right">
+        <el-table-column label="操作" width="100" fixed="right">
           <template #default="{ row }">
-            <el-button
-              type="primary"
-              link
-              @click="viewProgress(row)"
-              :disabled="row.status === 'rejected'"
-            >
-              查看进度
-            </el-button>
-            <el-button
-              type="danger"
-              link
-              @click="cancelApplication(row)"
-              v-if="row.status === 'pending'"
-            >
-              撤销投递
-            </el-button>
+            <el-dropdown trigger="click">
+              <el-button type="primary" link>
+                <el-icon><MoreFilled /></el-icon>
+              </el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item @click="viewProgress(row)" :disabled="row.status === 'rejected'">
+                    <el-icon><View /></el-icon>
+                    查看进度
+                  </el-dropdown-item>
+                  <el-dropdown-item 
+                    @click="cancelApplication(row)" 
+                    v-if="row.status === 'pending'"
+                    type="danger"
+                  >
+                    <el-icon><Delete /></el-icon>
+                    撤销投递
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
           </template>
         </el-table-column>
       </el-table>
@@ -95,8 +100,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { MoreFilled, View, Delete } from '@element-plus/icons-vue'
+import axios from 'axios'
+
+// 导出图标组件供模板使用
+const icons = {
+  MoreFilled,
+  View,
+  Delete
+}
 
 interface Progress {
   type: string
@@ -106,7 +120,6 @@ interface Progress {
 }
 
 interface Application {
-  id: number
   jobTitle: string
   company: string
   salary: string
@@ -119,61 +132,84 @@ const loading = ref(false)
 const status = ref('all')
 const currentPage = ref(1)
 const pageSize = ref(10)
-const total = ref(100)
+const total = ref(0)
+const applicationList = ref<Application[]>([])
 
-// 模拟数据
-const applicationList = ref<Application[]>([
-  {
-    id: 1,
-    jobTitle: '高级前端开发工程师',
-    company: '智简科技有限公司',
-    salary: '25k-35k',
-    applyTime: '2024-03-15 10:30:00',
-    status: 'reviewing',
-    progress: [
-      {
-        type: 'success',
-        color: '#0bbd87',
-        time: '2024-03-15 10:30:00',
-        content: '简历投递成功'
-      },
-      {
-        type: 'primary',
-        color: '#409EFF',
-        time: '2024-03-15 14:20:00',
-        content: 'HR开始审核简历'
+// 加载数据
+const loadData = async () => {
+  loading.value = true
+  try {
+    const token = localStorage.getItem('token')
+    const response = await axios.get(`/api/applications/user`,{
+      baseURL: 'http://localhost:8080',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'accept': '*/*'
       }
-    ]
-  },
-  {
-    id: 2,
-    jobTitle: '后端开发工程师',
-    company: '未来科技有限公司',
-    salary: '20k-30k',
-    applyTime: '2024-03-14 15:45:00',
-    status: 'interview',
-    progress: [
-      {
-        type: 'success',
-        color: '#0bbd87',
-        time: '2024-03-14 15:45:00',
-        content: '简历投递成功'
-      },
-      {
-        type: 'success',
-        color: '#0bbd87',
-        time: '2024-03-14 16:30:00',
-        content: '简历通过初筛'
-      },
-      {
-        type: 'primary',
-        color: '#409EFF',
-        time: '2024-03-15 09:00:00',
-        content: '安排面试：2024-03-16 14:00 线上面试'
-      }
-    ]
+    })
+    
+    if (response.data && Array.isArray(response.data)) {
+      // 转换后端数据格式为前端所需格式
+      applicationList.value = response.data.map((item: any) => ({
+        jobTitle: item.jobName,
+        company: item.company,
+        salary: item.salary_range,
+        applyTime: item.submittedTime,
+        status: mapStatus(item.status),
+        progress: [
+          {
+            type: 'success',
+            color: '#0bbd87',
+            time: item.submittedTime,
+            content: '简历投递成功'
+          }
+        ]
+      }))
+      total.value = response.data.length
+    } else if (response.data) {
+      // 如果只返回了单个对象，将其转换为数组
+      applicationList.value = [{
+        jobTitle: response.data.jobName,
+        company: response.data.company,
+        salary: response.data.salary_range,
+        applyTime: response.data.submittedTime,
+        status: mapStatus(response.data.status),
+        progress: [
+          {
+            type: 'success',
+            color: '#0bbd87',
+            time: response.data.submittedTime,
+            content: '简历投递成功'
+          }
+        ]
+      }]
+      total.value = 1
+    } else {
+      applicationList.value = []
+      total.value = 0
+    }
+  } catch (error) {
+    console.error('获取投递记录失败:', error)
+    ElMessage.error('获取投递记录失败')
+    applicationList.value = []
+    total.value = 0
+  } finally {
+    loading.value = false
   }
-])
+}
+
+// 状态映射函数
+const mapStatus = (status: string): string => {
+  const statusMap: Record<string, string> = {
+    '待处理': 'pending',
+    '审核中': 'reviewing',
+    '面试中': 'interview',
+    '已录用': 'offer',
+    '已拒绝': 'rejected'
+  }
+  return statusMap[status] || status
+}
 
 // 状态相关方法
 const getStatusType = (status: string) => {
@@ -209,14 +245,16 @@ const handleCurrentChange = (val: number) => {
   loadData()
 }
 
-// 加载数据
-const loadData = () => {
-  loading.value = true
-  // 模拟接口调用
-  setTimeout(() => {
-    loading.value = false
-  }, 500)
-}
+// 监听状态变化
+watch(status, () => {
+  currentPage.value = 1
+  loadData()
+})
+
+// 初始化加载
+onMounted(() => {
+  loadData()
+})
 
 // 查看职位详情
 const viewJobDetail = (row: Application) => {

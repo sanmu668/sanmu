@@ -5,69 +5,101 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f6c1b06a-e30f-4aa0-ab52-699ec425bfe1" name="更改" comment="">
-      <change afterPath="$PROJECT_DIR$/sql/resume_er_diagram.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/controller/JobController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/controller/ResumeController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/dto/JobDTO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/dto/ResumeDTO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/entity/Certificate.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/entity/EducationExperience.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/entity/Job.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/entity/Project.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/entity/Resume.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/entity/Skill.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/entity/WorkExperience.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/repository/JobRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/repository/ResumRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/service/JobService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/service/ResumeService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/service/impl/JobServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/config/MultipartConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/controller/admin/UserApplicationRecordController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/controller/user/ApplicationRecordController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/controller/user/UserJobController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/controller/user/UserResumeController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/dto/ApplicationRecordDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/dto/JobSearchRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/dto/UserSearchRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/entity/ApplicationRecord.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/repository/ApplicationRecordRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/security/JwtAuthenticationFilter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/service/admin/UserApplicationRecordService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/service/user/ApplicationRecordService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/service/user/JobPositionService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/service/user/UserResumeService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/node_modules/.package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/node_modules/.package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/@element-plus_icons-vue.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/node_modules/.vite/deps/@element-plus_icons-vue.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/_metadata.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/node_modules/.vite/deps/_metadata.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/axios.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/node_modules/.vite/deps/axios.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/chunk-5WWUZCGV.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/chunk-5WWUZCGV.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/echarts.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/node_modules/.vite/deps/echarts.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/element-plus.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/node_modules/.vite/deps/element-plus.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/pinia.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/node_modules/.vite/deps/pinia.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/vue-pdf-embed.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/node_modules/.vite/deps/vue-pdf-embed.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/vue-router.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/node_modules/.vite/deps/vue-router.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/vue.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/node_modules/.vite/deps/vue.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/api/userService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/api/userService.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/router/admin.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/router/admin.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/utils/request.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/utils/request.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/views/admin/JobManagement.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/views/admin/JobManagement.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/views/admin/Jobs.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/views/admin/ResumeManagement.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/views/admin/Resumes.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/views/admin/Resumes.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/layouts/FrontendLayout.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/layouts/FrontendLayout.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/router/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/router/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/types/user.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/types/user.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/views/admin/Applications.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/views/admin/Applications.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/views/admin/UserManagement.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/views/admin/UserManagement.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/views/frontend/AiChat.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/views/frontend/AiChat.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/tsconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/tsconfig.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sql/Mysql.sql" beforeDir="false" afterPath="$PROJECT_DIR$/sql/init.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/controller/AutoContrdoller.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/controller/AutoController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/controller/UserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/dto/UserDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/dto/UserDTO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/service/UserService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/service/impl/UserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/service/impl/UserServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/Application.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/Application.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/config/WebConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/config/WebConfig.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/controller/AutoContrdoller.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/controller/ChatController.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/controller/ChatController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/controller/ChatRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/controller/ChatRequest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/controller/SessionResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/controller/SessionResponse.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/controller/UserController.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/controller/UserController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/dto/AuthResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/dto/AuthResponse.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/dto/LoginRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/dto/LoginRequest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/dto/RegisterRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/dto/RegisterRequest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/dto/UserDTO.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/dto/UserDTO.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/entity/ChatMessage.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/entity/ChatMessage.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/entity/User$Role.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/entity/User$Role.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/entity/User.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/entity/User.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/repository/ChatMessageRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/repository/ChatMessageRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/views/common/Login.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/views/common/Login.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/views/frontend/Applications.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/views/frontend/Applications.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/views/frontend/Dashboard.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/views/frontend/Dashboard.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/views/frontend/Jobs.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/views/frontend/Jobs.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/views/frontend/Resume.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/views/frontend/Resume.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/vite.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/vite.config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sql/init.sql" beforeDir="false" afterPath="$PROJECT_DIR$/sql/init.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/controller/AutoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/controller/auth/AutoController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/controller/ChatController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/controller/user/ChatController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/controller/JobController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/controller/admin/JobController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/controller/ResumeController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/controller/admin/ResumeController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/controller/admin/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/dto/JobDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/dto/JobDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/entity/Certificate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/entity/resume/Certificate.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/entity/EducationExperience.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/entity/resume/EducationExperience.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/entity/Project.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/entity/resume/Project.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/entity/Resume.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/entity/resume/Resume.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/entity/Skill.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/entity/resume/Skill.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/entity/WorkExperience.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/entity/resume/WorkExperience.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/repository/ResumRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/repository/ResumRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/repository/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/repository/UserRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/security/JwtUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/security/JwtUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/service/AutoService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/service/auth/AutoService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/service/ChatHistoryService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/service/user/impl/ChatHistoryService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/service/ChatService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/service/user/ChatService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/service/JobService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/service/admin/JobService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/service/ResumeService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/service/admin/ResumeService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/service/admin/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/service/impl/ChatServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/service/user/impl/ChatServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/service/impl/JobServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/service/admin/impl/JobServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/service/impl/UserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/service/admin/impl/UserServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/controller/AutoController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/controller/ChatController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/controller/ChatRequest.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/controller/JobController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/controller/ResumeController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/controller/SessionResponse.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/controller/UserController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/dto/JobDTO.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/dto/JobDTO.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/entity/Certificate.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/entity/EducationExperience.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/entity/Project.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/entity/Resume.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/entity/Skill.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/entity/WorkExperience.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/repository/ResumRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/repository/ResumRepository.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/repository/UserRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/repository/UserRepository.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/security/JwtUtils.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/security/JwtUtils.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/security/PasswordEncoderConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/security/PasswordEncoderConfig.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/security/SecurityConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/security/SecurityConfig.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/service/AutoService.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/service/AutoService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/service/ChatHistoryService.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/service/ChatHistoryService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/service/ChatService.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/service/ChatService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/service/UserService.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/service/UserService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/service/impl/ChatServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/service/impl/ChatServiceImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/service/impl/UserServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/service/impl/UserServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/service/AutoService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/service/ChatHistoryService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/service/ChatService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/service/JobService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/service/ResumeService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/service/UserService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/service/impl/ChatServiceImpl.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/service/impl/JobServiceImpl.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/service/impl/UserServiceImpl.class" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
     </list>
@@ -173,6 +205,12 @@
       <workItem from="1746062267984" duration="11707000" />
       <workItem from="1746150035256" duration="23041000" />
       <workItem from="1746234283136" duration="35305000" />
+      <workItem from="1746346011199" duration="10744000" />
+      <workItem from="1746411129512" duration="22580000" />
+      <workItem from="1746456960460" duration="7973000" />
+      <workItem from="1746506982005" duration="17090000" />
+      <workItem from="1746584625560" duration="4125000" />
+      <workItem from="1746592177679" duration="11757000" />
     </task>
     <servers />
   </component>

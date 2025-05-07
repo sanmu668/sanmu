@@ -21,18 +21,18 @@
       
       <el-table :data="applications" style="width: 100%" v-loading="loading">
         <el-table-column prop="id" label="ID" width="80" />
-        <el-table-column prop="jobTitle" label="职位名称" width="200" />
+        <el-table-column prop="jobName" label="职位名称" width="200" />
         <el-table-column prop="company" label="公司" width="150" />
-        <el-table-column prop="applicant" label="申请人" width="120" />
+        <el-table-column prop="userName" label="申请人" width="120" />
         <el-table-column prop="status" label="状态" width="100">
           <template #default="{ row }">
             <el-tag :type="getStatusType(row.status)">
-              {{ getStatusText(row.status) }}
+              {{ row.status }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="applyTime" label="投递时间" width="180" />
-        <el-table-column prop="updateTime" label="更新时间" width="180" />
+        <el-table-column prop="submittedTime" label="投递时间" width="180" />
+        <el-table-column prop="updatedTime" label="更新时间" width="180" />
         <el-table-column label="操作" fixed="right" width="200">
           <template #default="{ row }">
             <el-button link type="primary" @click="handleView(row)">查看</el-button>
@@ -96,31 +96,29 @@
 import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
+import axios from 'axios'
 
 interface Application {
   id: number
-  jobTitle: string
+  resumeId: number
+  jobId: number
+  userId: number
+  userName: string
+  jobName: string
   company: string
-  applicant: string
-  status: ApplicationStatus
-  applyTime: string
-  updateTime: string
-}
-
-type ApplicationStatus = 'pending' | 'reviewing' | 'interview' | 'offer' | 'rejected'
-
-interface StatusOption {
-  label: string
-  value: ApplicationStatus
+  salary_range: string | null
+  status: string
+  submittedTime: string
+  updatedTime: string
 }
 
 // 状态选项
-const statusOptions: StatusOption[] = [
-  { label: '待处理', value: 'pending' },
-  { label: '简历筛选', value: 'reviewing' },
-  { label: '面试中', value: 'interview' },
-  { label: '已录用', value: 'offer' },
-  { label: '已拒绝', value: 'rejected' }
+const statusOptions = [
+  { label: '待处理', value: '待处理' },
+  { label: '简历筛选', value: '简历筛选' },
+  { label: '面试中', value: '面试中' },
+  { label: '已录用', value: '已录用' },
+  { label: '已拒绝', value: '已拒绝' }
 ]
 
 // 表格数据
@@ -134,53 +132,63 @@ const searchQuery = ref('')
 // 状态更新对话框
 const statusDialogVisible = ref(false)
 const statusForm = ref({
-  status: '' as ApplicationStatus,
+  status: '',
   remark: ''
 })
 const currentApplication = ref<Application | null>(null)
 
 // 获取状态标签类型
-const getStatusType = (status: ApplicationStatus) => {
-  const typeMap: Record<ApplicationStatus, string> = {
-    pending: 'info',
-    reviewing: 'warning',
-    interview: 'primary',
-    offer: 'success',
-    rejected: 'danger'
+const getStatusType = (status: string) => {
+  const typeMap: Record<string, string> = {
+    '待处理': 'info',
+    '简历筛选': 'warning',
+    '面试中': 'primary',
+    '已录用': 'success',
+    '已拒绝': 'danger'
   }
-  return typeMap[status]
-}
-
-// 获取状态文本
-const getStatusText = (status: ApplicationStatus) => {
-  const textMap: Record<ApplicationStatus, string> = {
-    pending: '待处理',
-    reviewing: '简历筛选',
-    interview: '面试中',
-    offer: '已录用',
-    rejected: '已拒绝'
-  }
-  return textMap[status]
+  return typeMap[status] || 'info'
 }
 
 // 获取投递列表
 const fetchApplications = async () => {
   loading.value = true
   try {
-    // TODO: 替换为实际的API调用
-    const mockData: Application[] = Array.from({ length: 10 }, (_, index) => ({
-      id: index + 1,
-      jobTitle: `高级前端开发工程师${index + 1}`,
-      company: '智简未来科技有限公司',
-      applicant: `申请人${index + 1}`,
-      status: ['pending', 'reviewing', 'interview', 'offer', 'rejected'][index % 5] as ApplicationStatus,
-      applyTime: new Date(Date.now() - Math.random() * 10 * 24 * 60 * 60 * 1000).toLocaleString(),
-      updateTime: new Date().toLocaleString()
-    }))
-    applications.value = mockData
-    total.value = 100
-  } catch (error) {
-    ElMessage.error('获取投递列表失败')
+    const response = await axios.get('http://localhost:8080/api/admin/applications', {
+      params: {
+        page: currentPage.value,
+        size: pageSize.value,
+        search: searchQuery.value
+      }
+    })
+    
+    // 检查响应数据格式并打印，用于调试
+    console.log('API Response:', response.data)
+    
+    // 如果响应是数组，直接使用
+    if (Array.isArray(response.data)) {
+      applications.value = response.data
+      total.value = response.data.length
+    } 
+    // 如果响应是单个对象，转换为数组
+    else if (typeof response.data === 'object' && response.data !== null) {
+      applications.value = [response.data]
+      total.value = 1
+    } 
+    // 如果响应包含分页信息
+    else if (response.data?.content) {
+      applications.value = response.data.content
+      total.value = response.data.totalElements
+    }
+    else {
+      applications.value = []
+      total.value = 0
+      console.warn('Unexpected API response format:', response.data)
+    }
+  } catch (error: any) {
+    console.error('Error fetching applications:', error)
+    ElMessage.error(`获取投递列表失败: ${error?.message || '未知错误'}`)
+    applications.value = []
+    total.value = 0
   } finally {
     loading.value = false
   }
@@ -206,15 +214,22 @@ const handleUpdateStatus = (row: Application) => {
 }
 
 // 提交状态更新
-const handleStatusSubmit = () => {
+const handleStatusSubmit = async () => {
   if (!currentApplication.value) return
   
-  // TODO: 替换为实际的API调用
-  currentApplication.value.status = statusForm.value.status
-  currentApplication.value.updateTime = new Date().toLocaleString()
-  
-  ElMessage.success('状态更新成功')
-  statusDialogVisible.value = false
+  try {
+    await axios.put(`http://localhost:8080/api/admin/applications/${currentApplication.value.id}/status`, {
+      status: statusForm.value.status,
+      remark: statusForm.value.remark
+    })
+    
+    ElMessage.success('状态更新成功')
+    statusDialogVisible.value = false
+    fetchApplications() // 刷新列表
+  } catch (error) {
+    ElMessage.error('状态更新失败')
+    console.error('Error updating application status:', error)
+  }
 }
 
 // 分页相关

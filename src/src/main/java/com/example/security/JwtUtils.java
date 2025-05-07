@@ -9,7 +9,7 @@ import java.util.Date;
 
 @Component
 public class JwtUtils {
-    private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    private static final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
     /**
      * 生成JWT令牌
@@ -34,7 +34,7 @@ public class JwtUtils {
      * @param token 需要解析的JWT令牌字符串
      * @return 解析后的Claims对象，包含令牌中的各种声明信息
      */
-    public Claims getClaimsFromToken(String token) {
+    public static Claims getClaimsFromToken(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()

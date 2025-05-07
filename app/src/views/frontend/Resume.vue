@@ -1,355 +1,182 @@
 <template>
   <div class="resume-container">
-    <el-card class="mb-20">
-      <template #header>
-        <div class="card-header">
-          <h3>我的简历</h3>
-          <el-button type="primary" @click="saveResume">保存简历</el-button>
-        </div>
-      </template>
+    <div class="resume-header">
+      <h2>我的简历</h2>
+      <el-button type="primary" @click="navigateToResumeModel">创建简历</el-button>
+    </div>
 
-      <el-form :model="resumeForm" label-width="100px">
-        <!-- 基本信息 -->
-        <el-divider content-position="left">基本信息</el-divider>
-        <el-row :gutter="20">
-          <el-col :span="12">
-            <el-form-item label="姓名">
-              <el-input v-model="resumeForm.basicInfo.name" placeholder="请输入姓名" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="年龄">
-              <el-input-number v-model="resumeForm.basicInfo.age" :min="16" :max="100" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="电话">
-              <el-input v-model="resumeForm.basicInfo.phone" placeholder="请输入联系电话" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="邮箱">
-              <el-input v-model="resumeForm.basicInfo.email" placeholder="请输入邮箱" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-
-        <!-- 教育经历 -->
-        <el-divider content-position="left">
-          <div class="divider-header">
-            <span>教育经历</span>
-            <el-button type="primary" link @click="addEducation">
-              <el-icon><Plus /></el-icon>添加教育经历
-            </el-button>
-          </div>
-        </el-divider>
-        
-        <div v-for="(edu, index) in resumeForm.education" :key="index" class="experience-item">
-          <el-row :gutter="20">
-            <el-col :span="12">
-              <el-form-item :label="'学校名称'">
-                <el-input v-model="edu.school" placeholder="请输入学校名称" />
-              </el-form-item>
-            </el-col>
-            <el-col :span="12">
-              <el-form-item :label="'专业'">
-                <el-input v-model="edu.major" placeholder="请输入专业" />
-              </el-form-item>
-            </el-col>
-            <el-col :span="12">
-              <el-form-item :label="'学历'">
-                <el-select v-model="edu.degree" placeholder="请选择学历">
-                  <el-option label="专科" value="专科" />
-                  <el-option label="本科" value="本科" />
-                  <el-option label="硕士" value="硕士" />
-                  <el-option label="博士" value="博士" />
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <el-col :span="12">
-              <el-form-item :label="'在读时间'">
-                <el-date-picker
-                  v-model="edu.time"
-                  type="daterange"
-                  range-separator="至"
-                  start-placeholder="开始时间"
-                  end-placeholder="结束时间"
-                  format="YYYY-MM"
-                  value-format="YYYY-MM"
-                />
-              </el-form-item>
-            </el-col>
-          </el-row>
-          <el-button type="danger" link class="delete-btn" @click="removeEducation(index)">
-            删除
-          </el-button>
-          <el-divider v-if="index !== resumeForm.education.length - 1" />
-        </div>
-
-        <!-- 工作经历 -->
-        <el-divider content-position="left">
-          <div class="divider-header">
-            <span>工作经历</span>
-            <el-button type="primary" link @click="addWork">
-              <el-icon><Plus /></el-icon>添加工作经历
-            </el-button>
-          </div>
-        </el-divider>
-        
-        <div v-for="(work, index) in resumeForm.work" :key="index" class="experience-item">
-          <el-row :gutter="20">
-            <el-col :span="12">
-              <el-form-item :label="'公司名称'">
-                <el-input v-model="work.company" placeholder="请输入公司名称" />
-              </el-form-item>
-            </el-col>
-            <el-col :span="12">
-              <el-form-item :label="'职位'">
-                <el-input v-model="work.position" placeholder="请输入职位" />
-              </el-form-item>
-            </el-col>
-            <el-col :span="24">
-              <el-form-item :label="'工作时间'">
-                <el-date-picker
-                  v-model="work.time"
-                  type="daterange"
-                  range-separator="至"
-                  start-placeholder="开始时间"
-                  end-placeholder="结束时间"
-                  format="YYYY-MM"
-                  value-format="YYYY-MM"
-                />
-              </el-form-item>
-            </el-col>
-            <el-col :span="24">
-              <el-form-item :label="'工作内容'">
-                <el-input
-                  v-model="work.description"
-                  type="textarea"
-                  :rows="3"
-                  placeholder="请输入工作内容描述"
-                />
-              </el-form-item>
-            </el-col>
-          </el-row>
-          <el-button type="danger" link class="delete-btn" @click="removeWork(index)">
-            删除
-          </el-button>
-          <el-divider v-if="index !== resumeForm.work.length - 1" />
-        </div>
-
-        <!-- 技能特长 -->
-        <el-divider content-position="left">技能特长</el-divider>
-        <el-form-item>
-          <el-tag
-            v-for="(tag, index) in resumeForm.skills"
-            :key="index"
-            class="skill-tag"
-            closable
-            @close="removeSkill(index)"
-          >
-            {{ tag }}
-          </el-tag>
-          <el-input
-            v-if="inputVisible"
-            ref="InputRef"
-            v-model="inputValue"
-            class="input-new-tag"
-            size="small"
-            @keyup.enter="addSkill"
-            @blur="addSkill"
-          />
-          <el-button v-else class="button-new-tag" size="small" @click="showInput">
-            <el-icon><Plus /></el-icon> 添加技能
-          </el-button>
-        </el-form-item>
-
-        <!-- 附件上传 -->
-        <el-divider content-position="left">附件简历</el-divider>
-        <el-upload
-          class="upload-demo"
-          drag
-          action="/api/upload"
-          accept=".pdf"
-          :limit="1"
-          :on-success="handleUploadSuccess"
-        >
-          <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-          <div class="el-upload__text">
-            拖拽文件到此处或 <em>点击上传</em>
-          </div>
-          <template #tip>
-            <div class="el-upload__tip">
-              只能上传 PDF 文件
-            </div>
+    <div class="resume-list">
+      <el-table 
+        v-loading="loading"
+        :data="resumeList" 
+        style="width: 100%"
+        :empty-text="error || '暂无简历数据'"
+      >
+        <el-table-column prop="title" label="名称" />
+        <el-table-column prop="updateTime" label="更新日期">
+          <template #default="{ row }">
+            {{ formatDate(row.updateTime) }}
           </template>
-        </el-upload>
-      </el-form>
-    </el-card>
+        </el-table-column>
+        <el-table-column label="操作">
+          <template #default="{ row }">
+            <el-button type="primary" link @click="editResume(row)">编辑</el-button>
+            <el-button type="success" link @click="viewResume(row)">查看</el-button>
+            <el-button type="danger" link @click="handleDelete(row)">删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, nextTick } from 'vue'
-import { ElMessage } from 'element-plus'
-import type { UploadProps } from 'element-plus'
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import axios from 'axios'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { openPdfPreview } from '@/utils/pdfPreview'
 
-interface Education {
-  school: string
-  major: string
-  degree: string
-  time: [string, string]
+const router = useRouter()
+const loading = ref(false)
+const error = ref('')
+
+interface ResumeItem {
+  id: number
+  userName: string
+  title: string
+  education: string | null
+  experience: string | null
+  status: string | null
+  updateTime: string
 }
 
-interface Work {
-  company: string
-  position: string
-  time: [string, string]
-  description: string
-}
+const resumeList = ref<ResumeItem[]>([])
 
-interface ResumeForm {
-  basicInfo: {
-    name: string
-    age: number
-    phone: string
-    email: string
+const fetchResumeList = async () => {
+  loading.value = true
+  error.value = ''
+  try {
+    const token = localStorage.getItem('token')
+    const response = await axios.get(`/api/user/resumes`, {
+      baseURL: 'http://localhost:8080',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'accept': '*/*'
+      }
+    })
+    
+    if (response.data) {
+      resumeList.value = Array.isArray(response.data) ? response.data : [response.data]
+    } else {
+      error.value = '获取数据失败'
+    }
+  } catch (err: any) {
+    console.error('获取简历列表失败:', err)
+    error.value = err.message || '获取简历列表失败'
+    ElMessage.error(error.value)
+  } finally {
+    loading.value = false
   }
-  education: Education[]
-  work: Work[]
-  skills: string[]
 }
 
-const resumeForm = reactive<ResumeForm>({
-  basicInfo: {
-    name: '',
-    age: 20,
-    phone: '',
-    email: ''
-  },
-  education: [],
-  work: [],
-  skills: []
+const formatDate = (dateString: string) => {
+  if (!dateString) return '-'
+  return new Date(dateString).toLocaleDateString('zh-CN')
+}
+
+const navigateToResumeModel = () => {
+  router.push('/resumeModel/cool')
+}
+
+const editResume = (resume: ResumeItem) => {
+  router.push(`/resume/edit/${resume.id}`)
+}
+
+const viewResume = async (row: ResumeItem) => {
+  try {
+    const token = localStorage.getItem('token')
+    if (!token) {
+      ElMessage.error('未登录或登录已过期')
+      return
+    }
+
+    const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
+    const pdfUrl = `${baseURL}/api/user/resumes/pdf/${row.id}`
+
+    openPdfPreview({
+      title: row.title,
+      pdfUrl,
+      token
+    })
+  } catch (error) {
+    console.error('预览PDF失败:', error)
+    ElMessage.error('打开PDF预览失败')
+  }
+}
+
+const handleDelete = (resume: ResumeItem) => {
+  ElMessageBox.confirm(
+    '确定要删除这份简历吗？此操作不可恢复',
+    '警告',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  ).then(async () => {
+    try {
+      const token = localStorage.getItem('token')
+      await axios.delete(`/api/user/resumes/${resume.id}`, {
+        baseURL: 'http://localhost:8080',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        }
+      })
+      ElMessage.success('删除成功')
+      fetchResumeList()
+    } catch (err: any) {
+      ElMessage.error('删除失败：' + (err.message || '未知错误'))
+    }
+  }).catch(() => {
+    // 用户取消删除操作
+  })
+}
+
+onMounted(() => {
+  fetchResumeList()
 })
-
-// 教育经历
-const addEducation = () => {
-  resumeForm.education.push({
-    school: '',
-    major: '',
-    degree: '',
-    time: ['', '']
-  })
-}
-
-const removeEducation = (index: number) => {
-  resumeForm.education.splice(index, 1)
-}
-
-// 工作经历
-const addWork = () => {
-  resumeForm.work.push({
-    company: '',
-    position: '',
-    time: ['', ''],
-    description: ''
-  })
-}
-
-const removeWork = (index: number) => {
-  resumeForm.work.splice(index, 1)
-}
-
-// 技能标签
-const inputValue = ref('')
-const inputVisible = ref(false)
-const InputRef = ref<HTMLInputElement>()
-
-const showInput = () => {
-  inputVisible.value = true
-  nextTick(() => {
-    InputRef.value?.focus()
-  })
-}
-
-const addSkill = () => {
-  if (inputValue.value) {
-    resumeForm.skills.push(inputValue.value)
-  }
-  inputVisible.value = false
-  inputValue.value = ''
-}
-
-const removeSkill = (index: number) => {
-  resumeForm.skills.splice(index, 1)
-}
-
-// 保存简历
-const saveResume = () => {
-  console.log('保存简历:', resumeForm)
-  ElMessage.success('简历保存成功！')
-}
-
-// 上传简历
-const handleUploadSuccess: UploadProps['onSuccess'] = (response) => {
-  ElMessage.success('文件上传成功！')
-}
 </script>
 
 <style lang="scss" scoped>
 .resume-container {
-  .card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    
-    h3 {
-      margin: 0;
-    }
+  padding: 20px;
+  background-color: #fff;
+  min-height: calc(100vh - 40px);
+}
+
+.resume-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+
+  h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: normal;
   }
-  
-  .divider-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  
-  .experience-item {
-    position: relative;
-    padding: 20px;
-    border-radius: 4px;
-    
-    &:hover {
-      background-color: var(--el-fill-color-light);
-      
-      .delete-btn {
-        display: block;
-      }
-    }
-    
-    .delete-btn {
-      display: none;
-      position: absolute;
-      top: 10px;
-      right: 10px;
-    }
-  }
-  
-  .skill-tag {
-    margin-right: 10px;
-    margin-bottom: 10px;
-  }
-  
-  .input-new-tag {
-    width: 90px;
-    margin-right: 10px;
-    vertical-align: bottom;
-  }
-  
-  .el-upload__tip {
-    color: var(--el-text-color-secondary);
-    font-size: 14px;
-    margin-top: 8px;
-  }
+}
+
+.resume-list {
+  background-color: #fff;
+  border-radius: 4px;
+}
+
+:deep(.el-table) {
+  --el-table-border-color: #ebeef5;
+  --el-table-header-background-color: #f5f7fa;
 }
 </style> 

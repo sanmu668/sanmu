@@ -1,5 +1,5 @@
 import request from '@/utils/request'
-import type { User, UserDTO } from '@/types/user'
+import type { User, UserDTO, UserQueryParams, PageResponse } from '@/types/user'
 
 export const createUser = (user: User) => {
   return request<User>({
@@ -16,10 +16,11 @@ export const getUserById = (id: number) => {
   })
 }
 
-export const getAllUsers = () => {
-  return request<UserDTO[]>({
+export const getAllUsers = (params?: UserQueryParams) => {
+  return request<PageResponse<UserDTO>>({
     url: '/user',
-    method: 'get'
+    method: 'get',
+    params
   })
 }
 
@@ -43,7 +44,7 @@ export const getUserByEmail = (email: string) => {
     url: `/user/email/${encodedEmail}`,
     method: 'get'
   })
-} 
+}
 
 export const updateUser = (id: number, user: Partial<User>) => {
   return request<User>({

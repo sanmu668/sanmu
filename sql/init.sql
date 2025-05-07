@@ -25,8 +25,12 @@ create table resumes(
     foreign key (user_id) references users(id) on delete cascade
 );
 
-drop table if exists resumes;
+ALTER TABLE resumes
+    ADD COLUMN file_name VARCHAR(255) NOT NULL,
+    ADD COLUMN original_file_name VARCHAR(255) NOT NULL,
+    ADD COLUMN file_size BIGINT NOT NULL;
 
+ALTER TABLE resumes ADD COLUMN templateName VARCHAR(255) AFTER title; #模版名
 #教育经历表
 create table education_experience(
     id int primary key auto_increment,
@@ -196,8 +200,6 @@ create table user_cache(
     foreign key (user_id) references users(id) on delete cascade
 );
 
-#修改user_id字段类型为BIGINT
-alter table chat_message modify column  user_id int not null ;
 
 #删除旧的外键约束
 # alter table chat_message drop foreign key chat_message_ibfk_1;
@@ -260,3 +262,24 @@ INSERT INTO certificates (resume_id, name) VALUES
                                                (2, '全栈开发工程师认证'),
                                                (3, '数据分析师高级认证'),
                                                (4, 'PMP项目管理专业人士资格认证');
+
+#申请记录表
+create table applications_record(
+    id int primary key auto_increment comment '申请记录ID',
+    resume_id int not null comment '简历ID',
+    job_id int not null comment '职位ID',
+    user_id int not null comment '用户ID',
+    status enum('待处理', '面试中','已录用', '已拒绝') default '待处理' comment '申请状态',
+    submitted_time DATETIME not null default current_timestamp comment '投递时间',
+    updated_time DATETIME not null default current_timestamp on update current_timestamp comment '更新时间',
+    note text comment '备注',
+    foreign key (resume_id) references resumes(id) on delete cascade ,
+    foreign key (job_id) references job_position(id) on delete cascade ,
+    foreign key (user_id) references users(id) on delete cascade ,
+
+    index `idx_user_id` (user_id),
+    index `idx_job_id` (job_id),
+    index  `idx_status` (status)
+)engine = InnoDB default charset = utf8mb4 comment = '简历投递记录表';
+
+DESCRIBE users;

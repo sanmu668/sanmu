@@ -1,8 +1,10 @@
 package com.example.repository;
 
 import com.example.dto.UserDTO;
+import com.example.entity.Job;
 import com.example.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -20,7 +22,7 @@ import java.util.Optional;
  * 该接口主要用于定义和用户实体相关的数据库操作，利用Spring Data JPA提供的强大功能
  * 可以不编写实体类，直接通过接口方法的命名约定来实现对数据库的操作
  */
-public interface UserRepository extends JpaRepository<User,Integer> {
+public interface UserRepository extends JpaRepository<User,Integer> , JpaSpecificationExecutor<User> {
     /**
      * 根据邮箱查询用户信息
      *
@@ -31,13 +33,6 @@ public interface UserRepository extends JpaRepository<User,Integer> {
      */
     Optional<User> findByEmail(String email);
 
-    @Query("SELECT new com.example.dto.UserDTO(u.id, u.photo, u.username, u.email, u.number, u.createdAt) FROM User u")
-    List<UserDTO> findAllUserDto();
-
-    @Query("SELECT new com.example.dto.UserDTO(u.id, u.photo, u.username, u.email, u.number, u.createdAt) FROM User u where u.username = :username")
-    List<UserDTO> findByUsername(String username);
-
-    @Query("SELECT new com.example.dto.UserDTO(u.id, u.photo, u.username, u.email, u.number, u.createdAt) FROM User u where u.email= :email")
-    Optional<UserDTO> findUserDtoByEmail(String email);
-
+    @Query("SELECT u FROM User u WHERE u.email = :email")
+    User getUserByEmail(@Param("email") String email); // 查不到时返回null
 }
