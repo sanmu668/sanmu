@@ -17,10 +17,12 @@ com\example\controller\user\ChatRequest.class
 com\example\entity\ApplicationRecord$ApplicationStatus.class
 com\example\entity\resume\EducationExperience.class
 com\example\security\JwtAuthenticationFilter.class
+com\example\controller\user\PersonalCenterController.class
 com\example\security\PasswordEncoderConfig.class
 com\example\controller\admin\ResumeController.class
 com\example\dto\ResumeDTO.class
 com\example\controller\user\UserResumeController.class
+com\example\dto\PasswordUpdateDTO.class
 com\example\controller\user\ChatController.class
 com\example\entity\resume\Certificate.class
 com\example\entity\User$Role.class
@@ -32,6 +34,7 @@ com\example\service\user\ChatService.class
 com\example\repository\ApplicationRecordRepository.class
 com\example\entity\Job.class
 com\example\controller\auth\AutoController.class
+com\example\dto\UserUpdateDTO.class
 com\example\dto\JobDTO.class
 com\example\service\user\impl\ChatHistoryService.class
 com\example\dto\LoginRequest.class
@@ -43,6 +46,7 @@ com\example\service\admin\UserService.class
 com\example\controller\admin\UserApplicationRecordController.class
 com\example\service\admin\JobService.class
 com\example\dto\UserSearchRequest.class
+com\example\service\user\PersonalCenterService.class
 com\example\service\admin\impl\UserServiceImpl.class
 com\example\service\user\UserResumeService.class
 com\example\service\admin\UserApplicationRecordService.class

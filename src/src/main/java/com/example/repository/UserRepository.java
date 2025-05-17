@@ -33,6 +33,9 @@ public interface UserRepository extends JpaRepository<User,Integer> , JpaSpecifi
      */
     Optional<User> findByEmail(String email);
 
+    boolean existsByEmail(String email);
+
+    Optional<User> findByUsername(String username);
     @Query("SELECT u FROM User u WHERE u.email = :email")
     User getUserByEmail(@Param("email") String email); // 查不到时返回null
 }

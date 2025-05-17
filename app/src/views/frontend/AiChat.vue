@@ -15,64 +15,6 @@
       
       <div class="sidebar-content">
         <div class="sidebar-section">
-          <div class="section-header">
-            <h3>简历分析</h3>
-            <el-upload
-              class="upload-btn"
-              :action="uploadUrl"
-              :before-upload="handleBeforeUpload"
-              :on-success="handleUploadSuccess"
-              :on-error="handleUploadError"
-              :show-file-list="false"
-              accept=".pdf"
-            >
-              <el-button type="primary" link>
-                <el-icon><component :is="icons.upload" /></el-icon>
-                上传简历
-              </el-button>
-            </el-upload>
-          </div>
-          <div class="resume-list">
-            <div v-for="resume in resumes" 
-                 :key="resume.id" 
-                 class="resume-item"
-                 :class="{ 
-                   'selected': selectedResumeId === resume.id,
-                   'analyzing': resume.status === 'analyzing',
-                   'error': resume.status === 'error'
-                 }"
-                 @click="selectResume(resume, $event)"
-                 draggable="true"
-                 @dragstart="handleDragStart($event, resume)">
-              <el-icon><component :is="icons.document" /></el-icon>
-              <div class="resume-info">
-                <span class="resume-name">{{ resume.name }}</span>
-                <span class="resume-meta">
-                  {{ formatFileSize(resume.fileSize) }} · {{ formatTime(resume.uploadTime) }}
-                </span>
-              </div>
-              <el-icon 
-                v-if="resume.status === 'analyzing'"
-                class="status-icon loading">
-                <component :is="icons.loading" />
-              </el-icon>
-              <el-icon 
-                v-else-if="resume.status === 'error'"
-                class="status-icon error">
-                <component :is="icons.warning" />
-              </el-icon>
-              <el-icon class="operation-icon" @click.stop="handleResumeOperationClick($event, resume)">
-                <component :is="icons.more" />
-              </el-icon>
-            </div>
-            <div v-if="resumes.length === 0" class="empty-tip">
-              <el-icon><component :is="icons.document" /></el-icon>
-              <p>暂无简历，请上传PDF格式的简历文件</p>
-            </div>
-          </div>
-        </div>
-        
-        <div class="sidebar-section">
           <h3>历史对话</h3>
           <div class="chat-history">
             <div v-for="chat in chatHistory" 
@@ -86,6 +28,82 @@
                 <component :is="icons.more" />
               </el-icon>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-window" :class="{ 'sidebar-collapsed': isSidebarCollapsed }">
+      <div class="chat-header">
+        <h2>AI 智能助手</h2>
+      </div>
+      <div class="messages" ref="messagesContainer">
+        <div v-for="(message, index) in messages" 
+             :key="index" 
+             :class="['message-wrapper', message.type]">
+          <div class="avatar">
+            <el-avatar :size="36">
+              <el-icon>
+                <component :is="message.type === 'user' ? icons.user : icons.service" />
+              </el-icon>
+            </el-avatar>
+          </div>
+          <div class="message-content">
+            <div class="message-bubble">
+              {{ message.content }}
+            </div>
+            <div class="message-time" v-if="message.time">
+              {{ message.time }}
+            </div>
+          </div>
+          <div v-if="message.type === 'user'" class="file-upload-icon">
+            <el-upload
+              class="upload-link"
+              :action="null"
+              :auto-upload="false"
+              :show-file-list="false"
+              :on-change="handleFileChange"
+            >
+              <el-icon><component :is="icons.paperclip" /></el-icon>
+            </el-upload>
+          </div>
+        </div>
+      </div>
+      <div class="input-area">
+        <div class="input-wrapper">
+          <el-input
+            v-model="userInput"
+            type="textarea"
+            :rows="3"
+            :maxlength="1000"
+            show-word-limit
+            resize="none"
+            placeholder="请输入您的问题..."
+            @keyup.enter.exact.prevent="handleSendMessage"
+          />
+          <div class="action-buttons">
+            <el-upload
+              class="upload-btn"
+              :action="null"
+              :auto-upload="false"
+              :show-file-list="false"
+              :on-change="handleFileChange"
+              :before-upload="handleBeforeUpload"
+              multiple
+              :accept="acceptFileTypes"
+            >
+              <el-button type="primary" plain>
+                <el-icon><component :is="icons.upload" /></el-icon>
+                上传文件
+              </el-button>
+            </el-upload>
+            <el-button 
+              type="primary" 
+              :loading="loading"
+              :disabled="!userInput.trim()"
+              @click="handleSendMessage">
+              发送
+            </el-button>
           </div>
         </div>
       </div>
@@ -115,57 +133,6 @@
       </div>
     </teleport>
 
-    <div class="chat-window" :class="{ 'sidebar-collapsed': isSidebarCollapsed }">
-      <div class="chat-header">
-        <h2>AI 智能助手</h2>
-      </div>
-      <div class="messages" ref="messagesContainer">
-        <div v-for="(message, index) in messages" 
-             :key="index" 
-             :class="['message-wrapper', message.type]">
-          <div class="avatar">
-            <el-avatar :size="36">
-              <el-icon>
-                <component :is="message.type === 'user' ? icons.user : icons.service" />
-              </el-icon>
-            </el-avatar>
-          </div>
-          <div class="message-content">
-            <div class="message-bubble">
-              {{ message.content }}
-            </div>
-            <div class="message-time">
-              {{ message.time }}
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="input-area">
-        <el-input
-          v-model="userInput"
-          type="textarea"
-          :rows="3"
-          :maxlength="1000"
-          show-word-limit
-          resize="none"
-          placeholder="请输入您的问题..."
-          @keyup.enter.exact.prevent="handleSendMessage"
-          @drop.prevent="handleDrop"
-          @dragover.prevent="handleDragOver"
-          @dragenter="handleDragEnter"
-          @dragleave="handleDragLeave"
-          :class="{ 'drag-over': isDragOver }"
-        />
-        <el-button 
-          type="primary" 
-          :loading="loading"
-          :disabled="!userInput.trim()"
-          @click="handleSendMessage">
-          发送
-        </el-button>
-      </div>
-    </div>
-
     <!-- 重命名对话框 -->
     <el-dialog
       v-model="isEditingName"
@@ -187,48 +154,16 @@
         </span>
       </template>
     </el-dialog>
-
-    <!-- PDF预览对话框 -->
-    <el-dialog
-      v-model="showPdfPreview"
-      :title="selectedResume?.name"
-      width="80%"
-      :fullscreen="true"
-      destroy-on-close
-    >
-      <div class="pdf-container">
-        <vue-pdf-embed
-          v-if="selectedResume?.url"
-          :source="selectedResume.url"
-          :page="currentPage"
-          @rendered="handlePdfRendered"
-        />
-        <div class="pdf-controls">
-          <el-button-group>
-            <el-button @click="currentPage--" :disabled="currentPage <= 1">
-              上一页
-            </el-button>
-            <el-button>{{ currentPage }} / {{ totalPages }}</el-button>
-            <el-button @click="currentPage++" :disabled="currentPage >= totalPages">
-              下一页
-            </el-button>
-          </el-button-group>
-        </div>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, nextTick, onUnmounted, computed } from 'vue'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
-import { defineComponent } from 'vue'
 import { sendMessage as sendChatMessage, createNewSession as createNewChatSession, getChatHistory } from '@/api/chat'
-import type { ChatMessage, ChatSession } from '@/api/chat'
+import type { ChatMessage } from '@/api/chat'
 import { ElMessage } from 'element-plus'
-import VuePdfEmbed from 'vue-pdf-embed'
-import type { Resume } from '@/api/resume'
-import { getResumeList, uploadResume, deleteResume, getResumeAnalysis } from '@/api/resume'
+import { useRouter } from 'vue-router'
 
 // 注册所有图标组件
 const icons = {
@@ -243,10 +178,11 @@ const icons = {
   service: ElementPlusIconsVue.Service,
   more: ElementPlusIconsVue.MoreFilled,
   edit: ElementPlusIconsVue.EditPen,
-  delete: ElementPlusIconsVue.Delete
+  delete: ElementPlusIconsVue.Delete,
+  paperclip: ElementPlusIconsVue.Paperclip
 }
 
-interface SavedChat extends ChatSession {
+interface SavedChat {
   id: string
   sessionId: string
   title: string
@@ -266,14 +202,13 @@ const messagesContainer = ref<HTMLElement | null>(null)
 const isSidebarCollapsed = ref(false)
 const currentSessionId = ref<string>('')
 const currentChatTitle = ref<string>('')
-const userId = ref(1) // TODO: Get from user authentication
-const selectedResumeId = ref<number | null>(null)
+const userId = ref<number | null>(null)
 const selectedChatId = ref<string | null>(null)
 const showOperationMenu = ref(false)
 const operationMenuPosition = ref({ x: 0, y: 0 })
 const isEditingName = ref(false)
 const editingName = ref('')
-const editingItemType = ref<'resume' | 'chat' | null>(null)
+const editingItemType = ref<'chat' | null>(null)
 
 // PDF预览相关
 const showPdfPreview = ref(false)
@@ -281,19 +216,78 @@ const currentPage = ref(1)
 const totalPages = ref(1)
 
 // 状态变量
-const resumes = ref<Resume[]>([])
 const chatHistory = ref<SavedChat[]>([])
 const uploadUrl = import.meta.env.VITE_API_BASE_URL + '/api/resumes/upload'
 const isUploading = ref(false)
 
 const selectedChat = computed(() => chatHistory.value.find((c: SavedChat) => c.id === selectedChatId.value))
-const selectedResume = computed(() => resumes.value.find(r => r.id === selectedResumeId.value))
+
+const router = useRouter()
 
 const toggleSidebar = () => {
   isSidebarCollapsed.value = !isSidebarCollapsed.value
 }
 
+const getUserInfo = () => {
+  // 检查 token
+  const token = localStorage.getItem('token')
+  console.log('Token:', token ? '存在' : '不存在')
+  
+  if (!token) {
+    ElMessage.error('请先登录')
+    router.push('/login')
+    return false
+  }
+
+  // 获取用户信息
+  const userInfo = localStorage.getItem('user')
+  console.log('User Info:', userInfo)
+  
+  if (userInfo) {
+    try {
+      const parsedUserInfo = JSON.parse(userInfo)
+      userId.value = parsedUserInfo.id || parsedUserInfo.userId
+      console.log('从用户信息中获取到的用户ID:', userId.value)
+      return true
+    } catch (error) {
+      console.error('解析用户信息失败:', error)
+    }
+  }
+
+  // 如果没有用户信息但有token，尝试从token中解析
+  try {
+    const base64Url = token.split('.')[1]
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+    }).join(''))
+
+    const tokenData = JSON.parse(jsonPayload)
+    userId.value = tokenData.id || tokenData.userId || tokenData.sub
+    console.log('从Token中解析到的用户ID:', userId.value)
+    return true
+  } catch (error) {
+    console.error('解析Token失败:', error)
+  }
+  
+  ElMessage.error('获取用户信息失败，请重新登录')
+  router.push('/login')
+  return false
+}
+
+const formatAIResponse = (text: string): string => {
+  if (!text) return ''
+  return text
+    .replace(/#{1,}/g, '') // 移除所有的#号
+    .replace(/\d+\./g, '\n$&') // 数字编号前添加换行
+    .replace(/[一二三四五六七八九十]、/g, '\n$&') // 中文数字编号前添加换行
+    .replace(/\s*-\s*/g, '\n- ') // 破折号前添加换行
+    .trim() // 移除首尾空格
+}
+
 const startNewChat = async () => {
+  if (!getUserInfo()) return
+  
   try {
     const response = await createNewChatSession()
     if (response) {
@@ -301,48 +295,32 @@ const startNewChat = async () => {
       currentChatTitle.value = ''
       messages.value = [{
         ...response,
-        content: response.answer || '',
+        content: formatAIResponse(response.answer || '你好！我是AI助手，很高兴为您服务。请问有什么我可以帮您的吗？'),
         type: 'ai',
         time: formatTimeFromTimestamp(response.timestamp)
       }]
     }
-  } catch (error) {
-    ElMessage.error('创建新会话失败，请稍后重试')
-    console.error('Error creating new session:', error)
+  } catch (error: any) {
+    if (error.response?.status === 401) {
+      ElMessage.error('登录已过期，请重新登录')
+      router.push('/login')
+    } else {
+      ElMessage.error('创建新会话失败，请稍后重试')
+      console.error('Error creating new session:', error)
+    }
   }
-}
-
-const selectResume = (resume: Resume, event?: MouseEvent) => {
-  if (event?.detail === 2) { // 双击
-    showPdfPreview.value = true
-    currentPage.value = 1
-    return
-  }
-  
-  selectedResumeId.value = resume.id
-  selectedChatId.value = null
-  
-  const timestamp = new Date().toISOString()
-  messages.value = [{
-    id: Date.now(),
-    userId: userId.value,
-    sessionId: currentSessionId.value || '',
-    content: `我将为您分析简历：${resume.name}，请稍等...`,
-    type: 'ai',
-    time: formatTime(),
-    timestamp: timestamp
-  }]
 }
 
 const loadChat = async (chat: SavedChat) => {
+  if (!getUserInfo()) return
+  
   try {
     selectedChatId.value = chat.id
-    selectedResumeId.value = null
     currentSessionId.value = chat.sessionId
     currentChatTitle.value = chat.title
     
     const response = await getChatHistory({
-      userId: userId.value,
+      userId: userId.value!,
       sessionId: chat.sessionId
     })
     
@@ -378,9 +356,14 @@ const loadChat = async (chat: SavedChat) => {
     
     messages.value = allMessages
     await scrollToBottom()
-  } catch (error) {
-    ElMessage.error('加载历史对话失败')
-    console.error('Error loading chat history:', error)
+  } catch (error: any) {
+    if (error.response?.status === 401) {
+      ElMessage.error('登录已过期，请重新登录')
+      router.push('/login')
+    } else {
+      ElMessage.error('加载历史对话失败')
+      console.error('Error loading chat history:', error)
+    }
   }
 }
 
@@ -394,10 +377,18 @@ const formatTime = () => {
 
 // 格式化时间戳
 const formatTimeFromTimestamp = (timestamp: string) => {
-  const date = new Date(timestamp)
-  const hours = date.getHours().toString().padStart(2, '0')
-  const minutes = date.getMinutes().toString().padStart(2, '0')
-  return `${hours}:${minutes}`
+  if (!timestamp) return ''
+  
+  try {
+    const date = new Date(timestamp)
+    if (isNaN(date.getTime())) return ''
+    
+    const hours = date.getHours().toString().padStart(2, '0')
+    const minutes = date.getMinutes().toString().padStart(2, '0')
+    return `${hours}:${minutes}`
+  } catch (error) {
+    return ''
+  }
 }
 
 // 滚动到最新消息
@@ -449,7 +440,8 @@ const loadChatHistory = () => {
 
 // 在发送消息后保存对话
 const handleSendMessage = async () => {
-  if (!userInput.value.trim()) return
+  if (!userInput.value.trim() || !getUserInfo()) return
+  
   if (!currentSessionId.value) {
     await startNewChat()
   }
@@ -459,7 +451,7 @@ const handleSendMessage = async () => {
   // 添加用户消息
   const userMessage: LocalMessage = {
     id: Date.now(),
-    userId: userId.value,
+    userId: userId.value!,
     sessionId: currentSessionId.value,
     content: userInput.value,
     question: userInput.value,
@@ -474,90 +466,34 @@ const handleSendMessage = async () => {
   await scrollToBottom()
   
   loading.value = true
-  let retryCount = 0
-  const maxRetries = 2
-
-  const tryRequest = async (): Promise<void> => {
-    try {
-      const response = await sendChatMessage({
-        userId: userId.value,
-        sessionId: currentSessionId.value,
-        question: userQuestion
-      })
-      
-      if (response) {
-        const aiMessage: LocalMessage = {
-          ...response,
-          content: response.answer || '',
-          type: 'ai',
-          time: formatTimeFromTimestamp(response.timestamp)
-        }
-        messages.value.push(aiMessage)
-        
-        // 保存对话到历史记录
-        saveChatToHistory()
-      }
-    } catch (error: any) {
-      console.error('Error:', error)
-      
-      // 处理超时错误
-      if (error.code === 'ECONNABORTED' && retryCount < maxRetries) {
-        retryCount++
-        ElMessage.warning(`请求超时，正在进行第${retryCount}次重试...`)
-        return tryRequest() // 递归重试
-      }
-
-      const errorTimestamp = new Date().toISOString()
-      const errorMessage: LocalMessage = {
-        id: Date.now(),
-        userId: userId.value,
-        sessionId: currentSessionId.value,
-        content: '抱歉，服务出现了一些问题，请稍后再试。',
-        type: 'ai',
-        time: formatTime(),
-        timestamp: errorTimestamp
-      }
-
-      if (error.code === 'ECONNABORTED') {
-        errorMessage.content = '请求响应时间过长，请稍后重试。'
-      } else if (error.response) {
-        switch (error.response.status) {
-          case 401:
-            errorMessage.content = '会话已过期，请刷新页面重新开始对话。'
-            break
-          case 429:
-            errorMessage.content = '请求过于频繁，请稍后再试。'
-            break
-          case 500:
-            errorMessage.content = '服务器内部错误，请稍后重试。'
-            break
-        }
-      }
-
-      messages.value.push(errorMessage)
-      ElMessage.error(errorMessage.content)
-    }
-  }
-
   try {
-    await tryRequest()
+    const response = await sendChatMessage({
+      userId: userId.value!,
+      sessionId: currentSessionId.value,
+      question: userQuestion
+    })
+    
+    if (response) {
+      const aiMessage: LocalMessage = {
+        ...response,
+        content: formatAIResponse(response.answer || ''),
+        type: 'ai',
+        time: formatTimeFromTimestamp(response.timestamp)
+      }
+      messages.value.push(aiMessage)
+      saveChatToHistory()
+    }
+  } catch (error: any) {
+    console.error('Error:', error)
+    handleSendError(error)
+    
+    if (error.response?.status === 401) {
+      router.push('/login')
+    }
   } finally {
     loading.value = false
     scrollToBottom()
   }
-}
-
-const handleResumeOperationClick = (event: MouseEvent, resume: Resume) => {
-  event.stopPropagation()
-  showOperationMenu.value = true
-  const rect = (event.target as HTMLElement).getBoundingClientRect()
-  operationMenuPosition.value = {
-    x: rect.right - 100, // 向左偏移菜单宽度
-    y: rect.top
-  }
-  selectedResumeId.value = resume.id
-  selectedChatId.value = null
-  editingItemType.value = 'resume'
 }
 
 const handleOperationClick = (event: MouseEvent, chat: SavedChat) => {
@@ -569,25 +505,18 @@ const handleOperationClick = (event: MouseEvent, chat: SavedChat) => {
     y: rect.top
   }
   selectedChatId.value = chat.id
-  selectedResumeId.value = null
   editingItemType.value = 'chat'
 }
 
-const handleRename = async (item: Resume | SavedChat) => {
-  editingName.value = 'sessionId' in item ? item.title : item.name
+const handleRename = async (item: SavedChat) => {
+  editingName.value = item.title
   isEditingName.value = true
-  editingItemType.value = 'sessionId' in item ? 'chat' : 'resume'
+  editingItemType.value = 'chat'
   showOperationMenu.value = false
 }
 
 const saveRename = () => {
-  if (editingItemType.value === 'resume' && selectedResume.value) {
-    const index = resumes.value.findIndex(r => r.id === selectedResumeId.value)
-    if (index !== -1) {
-      resumes.value[index].name = editingName.value
-      localStorage.setItem('savedResumes', JSON.stringify(resumes.value))
-    }
-  } else if (editingItemType.value === 'chat' && selectedChat.value) {
+  if (editingItemType.value === 'chat' && selectedChat.value) {
     const index = chatHistory.value.findIndex(c => c.id === selectedChatId.value)
     if (index !== -1) {
       chatHistory.value[index].title = editingName.value
@@ -599,25 +528,14 @@ const saveRename = () => {
   editingItemType.value = null
 }
 
-const handleDelete = async (item: Resume | SavedChat) => {
-  if ('id' in item) { // SavedChat
-    const index = chatHistory.value.findIndex(c => c.id === item.id)
-    if (index !== -1) {
-      chatHistory.value.splice(index, 1)
-      localStorage.setItem('chatHistory', JSON.stringify(chatHistory.value))
-      if (selectedChatId.value === item.id) {
-        selectedChatId.value = null
-        await startNewChat()
-      }
-    }
-  } else { // Resume
-    const index = resumes.value.findIndex(r => r.id === item.id)
-    if (index !== -1) {
-      resumes.value.splice(index, 1)
-      localStorage.setItem('savedResumes', JSON.stringify(resumes.value))
-      if (selectedResumeId.value === item.id) {
-        selectedResumeId.value = null
-      }
+const handleDelete = async (item: SavedChat) => {
+  const index = chatHistory.value.findIndex(c => c.id === item.id)
+  if (index !== -1) {
+    chatHistory.value.splice(index, 1)
+    localStorage.setItem('chatHistory', JSON.stringify(chatHistory.value))
+    if (selectedChatId.value === item.id) {
+      selectedChatId.value = null
+      await startNewChat()
     }
   }
   showOperationMenu.value = false
@@ -639,19 +557,27 @@ onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
 })
 
-// 在组件挂载时加载历史对话
+// 在组件挂载时检查用户登录状态并输出调试信息
 onMounted(async () => {
-  loadChatHistory()
-  await startNewChat()
+  console.log('组件挂载，开始检查登录状态...')
+  console.log('LocalStorage内容:', {
+    token: localStorage.getItem('token'),
+    user: localStorage.getItem('user')
+  })
+  
+  if (getUserInfo()) {
+    console.log('用户已登录，userId:', userId.value)
+    loadChatHistory()
+    await startNewChat()
+  } else {
+    console.log('用户未登录或登录状态无效')
+  }
 })
 
 // 添加计算属性
 const currentItem = computed(() => {
   if (editingItemType.value === 'chat' && selectedChat.value) {
     return selectedChat.value
-  }
-  if (editingItemType.value === 'resume' && selectedResume.value) {
-    return selectedResume.value
   }
   return null
 })
@@ -660,114 +586,137 @@ const handlePdfRendered: (numPages: number) => void = (numPages) => {
   totalPages.value = numPages
 }
 
-// 添加拖拽相关功能
-const handleDragStart = (event: DragEvent, resume: Resume) => {
-  if (event.dataTransfer) {
-    event.dataTransfer.setData('text/plain', JSON.stringify(resume))
-    event.dataTransfer.effectAllowed = 'copy'
-  }
-}
+// 添加文件类型限制
+const acceptFileTypes = '.jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.xls,.xlsx,.txt'
 
-// 拖拽状态
-const isDragOver = ref(false)
-
-const handleDragEnter = (event: DragEvent) => {
-  event.preventDefault()
-  isDragOver.value = true
-}
-
-const handleDragLeave = (event: DragEvent) => {
-  event.preventDefault()
-  isDragOver.value = false
-}
-
-// 修改 handleDrop 函数
-const handleDrop = (event: DragEvent) => {
-  event.preventDefault()
-  isDragOver.value = false
-  const data = event.dataTransfer?.getData('text/plain')
-  if (data) {
-    try {
-      const resume = JSON.parse(data) as Resume
-      userInput.value = `请分析这份简历：${resume.name}`
-    } catch (error) {
-      console.error('Invalid resume data:', error)
-    }
-  }
-}
-
-// 修改 handleDragOver 函数
-const handleDragOver = (event: DragEvent) => {
-  event.preventDefault()
-  if (event.dataTransfer) {
-    event.dataTransfer.dropEffect = 'copy'
-  }
-}
-
-// 格式化文件大小
-const formatFileSize = (bytes: number) => {
-  if (bytes === 0) return '0 B'
-  const k = 1024
-  const sizes = ['B', 'KB', 'MB', 'GB']
-  const i = Math.floor(Math.log(bytes) / Math.log(k))
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i]
-}
-
-// 格式化上传时间
-const formatUploadTime = (time: string) => {
-  const date = new Date(time)
-  const now = new Date()
-  const diff = now.getTime() - date.getTime()
-  
-  // 如果是今天的文件，只显示时间
-  if (date.toDateString() === now.toDateString()) {
-    return date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
-  }
-  
-  // 如果是最近7天的文件，显示周几
-  if (diff < 7 * 24 * 60 * 60 * 1000) {
-    const days = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
-    return days[date.getDay()]
-  }
-  
-  // 其他情况显示完整日期
-  return date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' })
-}
-
-// 上传相关方法
+// 添加文件上传相关方法
 const handleBeforeUpload = (file: File) => {
-  if (file.type !== 'application/pdf') {
-    ElMessage.error('只能上传PDF格式的文件')
-    return false
-  }
-  if (file.size / 1024 / 1024 > 10) {
+  const maxSize = 10 * 1024 * 1024 // 10MB
+  if (file.size > maxSize) {
     ElMessage.error('文件大小不能超过10MB')
     return false
   }
-  isUploading.value = true
   return true
 }
 
-const handleUploadSuccess = async (response: any) => {
-  isUploading.value = false
-  ElMessage.success('上传成功')
-  await loadResumeList()
-}
-
-const handleUploadError = () => {
-  isUploading.value = false
-  ElMessage.error('上传失败，请重试')
-}
-
-// 加载简历列表
-const loadResumeList = async () => {
-  try {
-    const response = await getResumeList()
-    resumes.value = response.data
-  } catch (error) {
-    console.error('Error loading resumes:', error)
-    ElMessage.error('加载简历列表失败')
+const handleFileChange = (file: any) => {
+  if (handleBeforeUpload(file.raw)) {
+    handleSendMessageWithFile(file.raw)
   }
+}
+
+const handleSendMessageWithFile = async (file: File) => {
+  if (!getUserInfo()) return
+  
+  if (!currentSessionId.value) {
+    await startNewChat()
+  }
+  
+  const timestamp = new Date().toISOString()
+  
+  // 添加用户消息
+  const userMessage: LocalMessage = {
+    id: Date.now(),
+    userId: userId.value!,
+    sessionId: currentSessionId.value,
+    content: `上传文件：${file.name}`,
+    question: `上传文件：${file.name}`,
+    type: 'user',
+    time: formatTime(),
+    timestamp: timestamp
+  }
+  messages.value.push(userMessage)
+  await scrollToBottom()
+  
+  loading.value = true
+  try {
+    const response = await sendChatMessage({
+      userId: userId.value!,
+      sessionId: currentSessionId.value,
+      file: file
+    })
+    
+    if (response) {
+      const aiMessage: LocalMessage = {
+        ...response,
+        content: response.answer || '',
+        type: 'ai',
+        time: formatTimeFromTimestamp(response.timestamp)
+      }
+      messages.value.push(aiMessage)
+      saveChatToHistory()
+    }
+  } catch (error: any) {
+    console.error('Error:', error)
+    handleSendError(error)
+    
+    if (error.response?.status === 401) {
+      router.push('/login')
+    }
+  } finally {
+    loading.value = false
+    scrollToBottom()
+  }
+}
+
+const handleSendError = (error: any) => {
+  const errorTimestamp = new Date().toISOString()
+  let errorContent = '抱歉，服务出现了一些问题，请稍后再试。'
+
+  if (error.code === 'ECONNABORTED') {
+    errorContent = error.message || '请求响应时间过长，请稍后重试。'
+  } else if (error.response) {
+    switch (error.response.status) {
+      case 401:
+        errorContent = '会话已过期，请刷新页面重新开始对话。'
+        break
+      case 429:
+        errorContent = '请求过于频繁，请稍后再试。'
+        break
+      case 500:
+        errorContent = '服务器内部错误，请稍后重试。'
+        break
+      case 502:
+        errorContent = '服务暂时不可用，请稍后重试。'
+        break
+      case 503:
+        errorContent = '服务器正在维护，请稍后重试。'
+        break
+      case 504:
+        errorContent = '服务器响应超时，请稍后重试。'
+        break
+    }
+  } else if (error.request) {
+    errorContent = '无法连接到服务器，请检查网络连接。'
+  }
+
+  const errorMessage: LocalMessage = {
+    id: Date.now(),
+    userId: userId.value!,
+    sessionId: currentSessionId.value,
+    content: errorContent,
+    type: 'ai',
+    time: formatTime(),
+    timestamp: errorTimestamp
+  }
+
+  messages.value.push(errorMessage)
+  ElMessage.error({
+    message: errorContent,
+    duration: 5000,
+    showClose: true
+  })
+
+  // 如果是认证相关错误，延迟跳转到登录页
+  if (error.response?.status === 401) {
+    setTimeout(() => {
+      router.push('/login')
+    }, 2000)
+  }
+}
+
+const handleFileUploadError = () => {
+  ElMessage.error('文件上传失败，请重试')
 }
 </script>
 
@@ -781,12 +730,13 @@ const loadResumeList = async () => {
   
   .sidebar {
     width: 260px;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
+    background: linear-gradient(to bottom, #ffffff, #f8f9fa);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     flex-direction: column;
+    overflow: hidden;
     
     &.collapsed {
       width: 60px;
@@ -797,22 +747,30 @@ const loadResumeList = async () => {
     
     .sidebar-header {
       padding: 16px;
-      border-bottom: 1px solid #e4e7ed;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+      background: #ffffff;
       
       .new-chat-btn {
-        flex: 1;
-      }
-      
-      .collapse-icon {
-        margin-left: 8px;
-        cursor: pointer;
-        transition: transform 0.3s;
+        background: #409EFF;
+        border: none;
+        border-radius: 12px;
+        padding: 10px 16px;
+        transition: all 0.3s ease;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-weight: 500;
         
-        &.collapsed {
-          transform: rotate(180deg);
+        &:hover {
+          background: #66b1ff;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(64, 158, 255, 0.2);
+        }
+        
+        &:active {
+          transform: translateY(0);
         }
       }
     }
@@ -820,64 +778,32 @@ const loadResumeList = async () => {
     .sidebar-content {
       flex: 1;
       overflow-y: auto;
-      
-      .sidebar-section {
-        padding: 16px;
-        
-        h3 {
-          margin: 0 0 12px;
-          font-size: 14px;
-          color: #909399;
-        }
-      }
-      
-      .resume-item, .chat-item {
+      padding: 12px;
+
+      .chat-item {
+        padding: 12px;
+        border-radius: 12px;
+        margin-bottom: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
         display: flex;
         align-items: center;
         gap: 8px;
-        padding: 8px 12px;
-        margin-bottom: 8px;
-        border-radius: 4px;
-        cursor: pointer;
-        position: relative;
+        color: #606266;
         
         &:hover {
-          background: #f5f7fa;
-          
-          .operation-icon {
-            display: block;
-          }
+          background: rgba(64, 158, 255, 0.1);
+          color: #409EFF;
         }
         
         &.selected {
-          background: #f0f2f5;
-        }
-        
-        .el-icon {
-          font-size: 16px;
-          color: #909399;
-        }
-        
-        span {
-          flex: 1;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
+          background: rgba(64, 158, 255, 0.15);
+          color: #409EFF;
+          font-weight: 500;
         }
 
-        .operation-icon {
-          display: none;
-          position: absolute;
-          right: 8px;
-          color: #909399;
-          cursor: pointer;
-          padding: 2px;
-          border-radius: 3px;
-          
-          &:hover {
-            color: #409EFF;
-            background-color: rgba(64, 158, 255, 0.1);
-          }
+        .el-icon {
+          font-size: 18px;
         }
       }
     }
@@ -885,60 +811,90 @@ const loadResumeList = async () => {
 
   .chat-window {
     flex: 1;
-    transition: all 0.3s ease;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     display: flex;
     flex-direction: column;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+    padding: 0 20px;
+    overflow: hidden;
+    position: relative;
     
-    &.sidebar-collapsed {
-      margin-left: -180px;
-    }
-
     .chat-header {
-      padding: 16px 20px;
-      border-bottom: 1px solid #e4e7ed;
+      padding: 20px 0;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+      background: #ffffff;
+      position: sticky;
+      top: 0;
+      z-index: 1;
       
       h2 {
         margin: 0;
+        font-size: 20px;
+        font-weight: 600;
         color: #303133;
-        font-size: 18px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        
+        &::before {
+          content: '';
+          display: block;
+          width: 4px;
+          height: 20px;
+          background: #409EFF;
+          border-radius: 2px;
+        }
       }
     }
-    
+
     .messages {
       flex: 1;
       overflow-y: auto;
-      padding: 20px;
-      padding-bottom: 60px;
-      
+      padding: 20px 0;
+      padding-bottom: 140px;
+      scroll-behavior: smooth;
+
       .message-wrapper {
         display: flex;
-        margin-bottom: 20px;
+        margin-bottom: 24px;
         
         .avatar {
           .el-avatar {
-            .el-icon {
-              font-size: 20px;
-              color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border: 2px solid #ffffff;
+            transition: all 0.3s ease;
+            
+            &:hover {
+              transform: scale(1.05);
             }
           }
         }
         
         .message-content {
-          flex: 1;
+          margin: 0 12px;
+          max-width: 80%;
           
           .message-bubble {
             padding: 12px 16px;
-            word-break: break-word;
-            white-space: pre-wrap;
+            border-radius: 12px;
+            position: relative;
+            line-height: 1.6;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            white-space: pre-line;
+            
+            &:hover {
+              transform: translateY(-1px);
+              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            }
           }
           
           .message-time {
-            margin-top: 4px;
             font-size: 12px;
             color: #909399;
+            margin-top: 4px;
+            opacity: 0.8;
           }
         }
         
@@ -946,13 +902,10 @@ const loadResumeList = async () => {
           flex-direction: row-reverse;
           
           .message-content {
-            margin-right: 12px;
-            margin-left: 60px;
-            
             .message-bubble {
-              background: #409EFF;
+              background: linear-gradient(135deg, #409EFF, #66b1ff);
               color: white;
-              border-radius: 8px 2px 8px 8px;
+              border-radius: 12px 12px 0 12px;
             }
             
             .message-time {
@@ -961,57 +914,164 @@ const loadResumeList = async () => {
           }
           
           .avatar .el-avatar {
-            background: #67C23A;
+            background: #409EFF;
           }
         }
         
         &.ai {
           .message-content {
-            margin-left: 12px;
-            margin-right: 60px;
-            
             .message-bubble {
-              background: #f4f4f5;
+              background: #f4f6f8;
               color: #303133;
-              border-radius: 2px 8px 8px 8px;
+              border-radius: 12px 12px 12px 0;
+              
+              p {
+                margin: 8px 0;
+                &:first-child {
+                  margin-top: 0;
+                }
+                &:last-child {
+                  margin-bottom: 0;
+                }
+              }
+              
+              ul, ol {
+                margin: 8px 0;
+                padding-left: 20px;
+              }
+              
+              li {
+                margin: 4px 0;
+              }
             }
           }
           
           .avatar .el-avatar {
-            background: #409EFF;
+            background: #67C23A;
           }
         }
       }
     }
-    
+
     .input-area {
-      padding: 12px 20px;
-      margin-top: -60px;
-      border-top: 1px solid #e4e7ed;
-      display: flex;
-      gap: 12px;
-      background: white;
-      position: relative;
-      z-index: 1;
-      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+      position: fixed;
+      bottom: 0;
+      left: 280px;
+      right: 20px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(0, 0, 0, 0.06);
+      transition: all 0.3s ease;
       
-      .el-textarea {
-        flex: 1;
+      .input-wrapper {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
         
-        :deep(.el-textarea__inner) {
-          transition: all 0.3s;
+        .el-textarea {
+          .el-textarea__inner {
+            border-radius: 12px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            padding: 12px 16px;
+            min-height: 60px;
+            
+            &:focus {
+              border-color: #409EFF;
+              box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2);
+            }
+          }
+        }
+        
+        .action-buttons {
+          display: flex;
+          justify-content: flex-end;
+          gap: 12px;
           
-          &.drag-over {
-            border-color: #409EFF;
-            border-style: dashed;
-            background-color: rgba(64, 158, 255, 0.1);
+          .el-button {
+            border-radius: 12px;
+            padding: 10px 24px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            
+            &:hover {
+              transform: translateY(-1px);
+              box-shadow: 0 4px 12px rgba(64, 158, 255, 0.2);
+            }
+            
+            &:active {
+              transform: translateY(0);
+            }
+          }
+          
+          .upload-btn {
+            .el-button {
+              background: #f4f6f8;
+              border: none;
+              color: #606266;
+              
+              &:hover {
+                background: #e8eaec;
+              }
+            }
           }
         }
       }
+    }
+
+    &.sidebar-collapsed {
+      .input-area {
+        left: 80px; // 60px (collapsed sidebar) + 20px (gap)
+      }
+    }
+  }
+}
+
+// 自定义滚动条样式
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c0c4cc;
+  border-radius: 3px;
+  
+  &:hover {
+    background: #909399;
+  }
+}
+
+// 添加响应式设计
+@media screen and (max-width: 768px) {
+  .ai-chat-container {
+    padding: 10px;
+    
+    .sidebar {
+      width: 200px;
       
-      .el-button {
-        align-self: flex-end;
-        min-width: 80px;
+      &.collapsed {
+        width: 0;
+      }
+    }
+    
+    .chat-window {
+      .input-area {
+        left: 200px;
+        padding: 10px;
+        
+        .input-wrapper {
+          .action-buttons {
+            flex-wrap: wrap;
+          }
+        }
       }
     }
   }
@@ -1050,26 +1110,33 @@ const loadResumeList = async () => {
 }
 
 .message-wrapper {
-  &.user {
-    .avatar .el-avatar {
-      background: #67C23A;
+  position: relative;
+  
+  .file-upload-icon {
+    position: absolute;
+    right: -30px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    
+    .upload-link {
+      cursor: pointer;
+      color: #909399;
+      
+      &:hover {
+        color: #409EFF;
+      }
+      
+      .el-icon {
+        font-size: 16px;
+      }
     }
   }
   
-  &.ai {
-    .avatar .el-avatar {
-      background: #409EFF;
-    }
-  }
-}
-
-.avatar {
-  .el-avatar {
-    background: #409EFF;
-    
-    .el-icon {
-      font-size: 20px;
-      color: white;
+  &:hover {
+    .file-upload-icon {
+      opacity: 1;
     }
   }
 }
@@ -1111,14 +1178,6 @@ const loadResumeList = async () => {
         }
       }
     }
-  }
-}
-
-.resume-item {
-  cursor: grab;
-  
-  &:active {
-    cursor: grabbing;
   }
 }
 

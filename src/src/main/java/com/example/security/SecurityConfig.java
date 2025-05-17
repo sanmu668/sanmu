@@ -32,7 +32,7 @@ public class SecurityConfig {
                 // 配置请求授权规则
                 .authorizeHttpRequests(auth -> auth
                         // 允许所有以"api/auth/**"开头的请求无需认证即可访问
-                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/**").permitAll()
                         .anyRequest().permitAll());
         // 构建并返回配置好的SecurityFilterChain
         return http.build();

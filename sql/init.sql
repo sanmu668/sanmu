@@ -13,6 +13,15 @@ create table users(
     last_login timestamp null   #   最后登录时间
 );
 
+ALTER TABLE users ADD COLUMN username VARCHAR(100) NOT NULL AFTER id;
+
+ALTER TABLE users ADD COLUMN photo LONGBLOB AFTER password_hash;
+
+ALTER TABLE users ADD COLUMN number CHAR(11) NOT NULL  AFTER photo;
+
+SHOW COLUMNS FROM users;
+ALTER TABLE users ADD COLUMN bio TEXT;
+
 #简历表
 create table resumes(
     id int auto_increment primary key ,  #   简历ID
@@ -207,13 +216,7 @@ create table user_cache(
 #添加新外键约束
 alter table chat_message add constraint fk_chat_message_user foreign key (user_id) references users(id) on delete cascade ;
 
-ALTER TABLE users ADD COLUMN username VARCHAR(100) NOT NULL AFTER id;
 
-ALTER TABLE users ADD COLUMN photo LONGBLOB AFTER password_hash;
-
-ALTER TABLE users ADD COLUMN number CHAR(11) NOT NULL  AFTER photo;
-
-SHOW COLUMNS FROM users;
 
 
 INSERT INTO resumes (id, user_id, title, summary, file_path) VALUES

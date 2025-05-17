@@ -5,101 +5,126 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f6c1b06a-e30f-4aa0-ab52-699ec425bfe1" name="更改" comment="">
-      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/config/MultipartConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/controller/admin/UserApplicationRecordController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/controller/user/ApplicationRecordController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/controller/user/UserJobController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/controller/user/UserResumeController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/dto/ApplicationRecordDTO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/dto/JobSearchRequest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/dto/UserSearchRequest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/entity/ApplicationRecord.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/repository/ApplicationRecordRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/security/JwtAuthenticationFilter.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/service/admin/UserApplicationRecordService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/service/user/ApplicationRecordService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/service/user/JobPositionService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/service/user/UserResumeService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/node_modules/.package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/node_modules/.package-lock.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/controller/user/PersonalCenterController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/dto/PasswordUpdateDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/dto/UserUpdateDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/src/main/java/com/example/service/user/PersonalCenterService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/@element-plus_icons-vue.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/node_modules/.vite/deps/@element-plus_icons-vue.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/@element-plus_icons-vue.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/app/node_modules/.vite/deps/@element-plus_icons-vue.js.map" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/_metadata.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/node_modules/.vite/deps/_metadata.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/axios.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/node_modules/.vite/deps/axios.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/chunk-5WWUZCGV.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/chunk-5WWUZCGV.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/axios.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/app/node_modules/.vite/deps/axios.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/chunk-HYZ2CRGS.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/chunk-HYZ2CRGS.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/chunk-ODKTEGB3.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/chunk-ODKTEGB3.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/chunk-RNAYSZCV.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/chunk-RNAYSZCV.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/chunk-ROME4SDB.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/node_modules/.vite/deps/chunk-ROME4SDB.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/chunk-ROME4SDB.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/app/node_modules/.vite/deps/chunk-ROME4SDB.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/chunk-S7ZBDJCF.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/chunk-S7ZBDJCF.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/chunk-YFT6OQ5R.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/chunk-YFT6OQ5R.js.map" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/echarts.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/node_modules/.vite/deps/echarts.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/echarts.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/app/node_modules/.vite/deps/echarts.js.map" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/element-plus.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/node_modules/.vite/deps/element-plus.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/element-plus.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/app/node_modules/.vite/deps/element-plus.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/html2canvas.esm-7WWO7M7D.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/node_modules/.vite/deps/html2canvas.esm-7WWO7M7D.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/html2canvas.esm-7WWO7M7D.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/app/node_modules/.vite/deps/html2canvas.esm-7WWO7M7D.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/html2pdf__js.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/node_modules/.vite/deps/html2pdf__js.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/html2pdf__js.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/app/node_modules/.vite/deps/html2pdf__js.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/html2pdf__js_dist_html2pdf__bundle__min__js.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/node_modules/.vite/deps/html2pdf__js_dist_html2pdf__bundle__min__js.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/html2pdf__js_dist_html2pdf__bundle__min__js.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/app/node_modules/.vite/deps/html2pdf__js_dist_html2pdf__bundle__min__js.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/index.es-KXP5N26Z.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/index.es-KXP5N26Z.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/node_modules/.vite/deps/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/pinia.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/node_modules/.vite/deps/pinia.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/pinia.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/app/node_modules/.vite/deps/pinia.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/purify.es-D3MTBYVS.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/node_modules/.vite/deps/purify.es-D3MTBYVS.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/purify.es-D3MTBYVS.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/app/node_modules/.vite/deps/purify.es-D3MTBYVS.js.map" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/vue-pdf-embed.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/node_modules/.vite/deps/vue-pdf-embed.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/vue-pdf-embed.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/app/node_modules/.vite/deps/vue-pdf-embed.js.map" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/vue-router.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/node_modules/.vite/deps/vue-router.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/vue-router.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/app/node_modules/.vite/deps/vue-router.js.map" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/vue.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/node_modules/.vite/deps/vue.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/api/userService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/api/userService.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/layouts/FrontendLayout.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/layouts/FrontendLayout.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/router/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/router/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/types/user.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/types/user.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/views/admin/Applications.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/views/admin/Applications.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/views/admin/UserManagement.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/views/admin/UserManagement.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/views/common/Login.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/views/common/Login.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/views/frontend/Applications.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/views/frontend/Applications.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node_modules/.vite/deps/vue.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/app/node_modules/.vite/deps/vue.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node_modules/.vue-global-types/vue_3.5_0_0_0.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/node_modules/.vue-global-types/vue_3.5_0_0_0.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/node_modules/.vue-global-types/vue_99_0_0_0.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/node_modules/.vue-global-types/vue_99_0_0_0.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/api/chat.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/api/chat.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/views/frontend/AiChat.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/views/frontend/AiChat.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/views/frontend/Dashboard.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/views/frontend/Dashboard.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/views/frontend/Jobs.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/views/frontend/Jobs.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/views/frontend/Resume.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/views/frontend/Resume.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/views/frontend/Settings.vue" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/views/frontend/Settings.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/vite.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/vite.config.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/sql/init.sql" beforeDir="false" afterPath="$PROJECT_DIR$/sql/init.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/controller/AutoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/controller/auth/AutoController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/controller/ChatController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/controller/user/ChatController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/controller/JobController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/controller/admin/JobController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/controller/ResumeController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/controller/admin/ResumeController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/controller/admin/UserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/dto/JobDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/dto/JobDTO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/entity/Certificate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/entity/resume/Certificate.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/entity/EducationExperience.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/entity/resume/EducationExperience.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/entity/Project.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/entity/resume/Project.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/entity/Resume.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/entity/resume/Resume.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/entity/Skill.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/entity/resume/Skill.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/entity/WorkExperience.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/entity/resume/WorkExperience.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/repository/ResumRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/repository/ResumRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/config/MultipartConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/config/MultipartConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/config/WebConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/config/WebConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/controller/user/ChatController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/controller/user/ChatController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/entity/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/entity/User.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/repository/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/repository/UserRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/security/JwtUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/security/JwtUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/service/AutoService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/service/auth/AutoService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/service/ChatHistoryService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/service/user/impl/ChatHistoryService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/service/ChatService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/service/user/ChatService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/service/JobService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/service/admin/JobService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/service/ResumeService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/service/admin/ResumeService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/service/admin/UserService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/service/impl/ChatServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/service/user/impl/ChatServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/service/impl/JobServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/service/admin/impl/JobServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/service/impl/UserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/service/admin/impl/UserServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/controller/AutoController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/controller/ChatController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/controller/ChatRequest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/controller/JobController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/controller/ResumeController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/controller/SessionResponse.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/controller/UserController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/security/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/security/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/service/user/ChatService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/service/user/ChatService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/src/main/java/com/example/service/user/impl/ChatServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/src/main/java/com/example/service/user/impl/ChatServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/Application.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/Application.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/config/MultipartConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/config/MultipartConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/config/WebConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/config/WebConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/controller/admin/JobController.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/controller/admin/JobController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/controller/admin/ResumeController.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/controller/admin/ResumeController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/controller/admin/UserApplicationRecordController.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/controller/admin/UserApplicationRecordController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/controller/admin/UserController.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/controller/admin/UserController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/controller/auth/AutoController.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/controller/auth/AutoController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/controller/user/ApplicationRecordController$SubmitRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/controller/user/ApplicationRecordController$SubmitRequest.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/controller/user/ApplicationRecordController.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/controller/user/ApplicationRecordController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/controller/user/ChatController.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/controller/user/ChatController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/controller/user/ChatRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/controller/user/ChatRequest.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/controller/user/SessionResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/controller/user/SessionResponse.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/controller/user/UserJobController.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/controller/user/UserJobController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/controller/user/UserResumeController$ResumeRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/controller/user/UserResumeController$ResumeRequest.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/controller/user/UserResumeController.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/controller/user/UserResumeController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/dto/ApplicationRecordDTO.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/dto/ApplicationRecordDTO.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/dto/AuthResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/dto/AuthResponse.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/dto/JobDTO.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/dto/JobDTO.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/entity/Certificate.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/entity/EducationExperience.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/entity/Project.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/entity/Resume.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/entity/Skill.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/entity/WorkExperience.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/dto/JobSearchRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/dto/JobSearchRequest.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/dto/LoginRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/dto/LoginRequest.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/dto/RegisterRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/dto/RegisterRequest.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/dto/ResumeDTO.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/dto/ResumeDTO.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/dto/UserDTO.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/dto/UserDTO.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/dto/UserSearchRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/dto/UserSearchRequest.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/entity/ApplicationRecord$ApplicationStatus.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/entity/ApplicationRecord$ApplicationStatus.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/entity/ApplicationRecord.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/entity/ApplicationRecord.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/entity/ChatMessage.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/entity/ChatMessage.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/entity/Job.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/entity/Job.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/entity/User$Role.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/entity/User$Role.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/entity/User.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/entity/User.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/entity/resume/Certificate.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/entity/resume/Certificate.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/entity/resume/EducationExperience.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/entity/resume/EducationExperience.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/entity/resume/Project.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/entity/resume/Project.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/entity/resume/Resume.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/entity/resume/Resume.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/entity/resume/Skill.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/entity/resume/Skill.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/entity/resume/WorkExperience.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/entity/resume/WorkExperience.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/repository/ApplicationRecordRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/repository/ApplicationRecordRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/repository/ChatMessageRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/repository/ChatMessageRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/repository/JobRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/repository/JobRepository.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/repository/ResumRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/repository/ResumRepository.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/repository/UserRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/repository/UserRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/security/JwtAuthenticationFilter.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/security/JwtAuthenticationFilter.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/security/JwtUtils.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/security/JwtUtils.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/service/AutoService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/service/ChatHistoryService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/service/ChatService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/service/JobService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/service/ResumeService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/service/UserService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/service/impl/ChatServiceImpl.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/service/impl/JobServiceImpl.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/service/impl/UserServiceImpl.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/security/PasswordEncoderConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/security/PasswordEncoderConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/security/SecurityConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/security/SecurityConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/service/admin/JobService.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/service/admin/JobService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/service/admin/ResumeService.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/service/admin/ResumeService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/service/admin/UserApplicationRecordService.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/service/admin/UserApplicationRecordService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/service/admin/UserService.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/service/admin/UserService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/service/admin/impl/JobServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/service/admin/impl/JobServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/service/admin/impl/UserServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/service/admin/impl/UserServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/service/auth/AutoService.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/service/auth/AutoService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/service/user/ApplicationRecordService.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/service/user/ApplicationRecordService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/service/user/ChatService.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/service/user/ChatService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/service/user/JobPositionService.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/service/user/JobPositionService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/service/user/UserResumeService.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/service/user/UserResumeService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/service/user/impl/ChatHistoryService.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/service/user/impl/ChatHistoryService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/target/classes/com/example/service/user/impl/ChatServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/classes/com/example/service/user/impl/ChatServiceImpl.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/src/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
     </list>
@@ -211,6 +236,8 @@
       <workItem from="1746506982005" duration="17090000" />
       <workItem from="1746584625560" duration="4125000" />
       <workItem from="1746592177679" duration="11757000" />
+      <workItem from="1747390623309" duration="15733000" />
+      <workItem from="1747445452841" duration="2227000" />
     </task>
     <servers />
   </component>

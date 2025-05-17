@@ -1,7 +1,43 @@
 import axios from 'axios'
 
-// 使用相对路径，通过 Vite 代理转发请求
-const BASE_URL = '/api'
+// 使用与简历表相同的配置
+const BASE_URL = 'http://localhost:8080'
+
+// 创建axios实例
+const request = axios.create({
+  baseURL: BASE_URL,
+  timeout: 30000,
+  timeoutErrorMessage: '请求超时，请检查网络连接或稍后重试'
+})
+
+// 请求拦截器
+request.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token')
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`
+      config.headers['Content-Type'] = config.headers['Content-Type'] || 'application/json'
+      config.headers['accept'] = '*/*'
+    }
+    return config
+  },
+  (error) => {
+    return Promise.reject(error)
+  }
+)
+
+// 响应拦截器
+request.interceptors.response.use(
+  (response) => {
+    return response
+  },
+  (error) => {
+    if (error.code === 'ECONNABORTED' && error.message.includes('timeout')) {
+      error.message = '请求超时，请检查网络连接或稍后重试'
+    }
+    return Promise.reject(error)
+  }
+)
 
 export interface ChatMessage {
   id: number
@@ -26,9 +62,27 @@ export interface ChatSession {
 export const sendMessage = async (params: {
   userId: number
   sessionId: string
-  question: string
+  question?: string
+  file?: File
 }): Promise<ChatMessage> => {
-  const response = await axios.post(`${BASE_URL}/chat/message`, params)
+  const formData = new FormData()
+  formData.append('sessionId', params.sessionId)
+
+  if (params.question) {
+    formData.append('question', params.question)
+  }
+
+  if (params.file) {
+    formData.append('file', params.file)
+  }
+
+  const response = await request.post('/api/chat/message', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      'accept': '*/*'
+    }
+  })
   return response.data
 }
 
@@ -37,22 +91,28 @@ export const getChatHistory = async (params: {
   userId: number
   sessionId: string
 }): Promise<ChatMessage[]> => {
-  const response = await axios.get(
-    `${BASE_URL}/chat/history`,
-    { params }
+  const response = await request.get(
+    '/api/chat/history',
+    {
+      params,
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json',
+        'accept': '*/*'
+      }
+    }
   )
   return response.data
 }
 
 // 创建新会话
 export const createNewSession = async (): Promise<ChatMessage> => {
-  // TODO: Implement when backend provides this endpoint
-  return {
-    id: Date.now(),
-    userId: 1,
-    sessionId: Math.random().toString(36).substring(7),
-    answer: "您好！我是您的AI简历优化与职业咨询专家。请问有什么可以帮您？",
-    timestamp: new Date().toISOString(),
-    type: 'ai'
-  }
+  const response = await request.post('/api/chat/new-session', null, {
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      'Content-Type': 'application/json',
+      'accept': '*/*'
+    }
+  })
+  return response.data
 } 

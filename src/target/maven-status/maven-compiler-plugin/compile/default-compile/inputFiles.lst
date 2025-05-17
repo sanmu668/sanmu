@@ -5,6 +5,7 @@ E:\DevelopmentProject\AI 智能客服 SaaS系统\ai-resume-system\src\src\main\java\co
 E:\DevelopmentProject\AI 智能客服 SaaS系统\ai-resume-system\src\src\main\java\com\example\service\admin\ResumeService.java
 E:\DevelopmentProject\AI 智能客服 SaaS系统\ai-resume-system\src\src\main\java\com\example\dto\JobSearchRequest.java
 E:\DevelopmentProject\AI 智能客服 SaaS系统\ai-resume-system\src\src\main\java\com\example\service\auth\AutoService.java
+E:\DevelopmentProject\AI 智能客服 SaaS系统\ai-resume-system\src\src\main\java\com\example\dto\PasswordUpdateDTO.java
 E:\DevelopmentProject\AI 智能客服 SaaS系统\ai-resume-system\src\src\main\java\com\example\dto\LoginRequest.java
 E:\DevelopmentProject\AI 智能客服 SaaS系统\ai-resume-system\src\src\main\java\com\example\security\PasswordEncoderConfig.java
 E:\DevelopmentProject\AI 智能客服 SaaS系统\ai-resume-system\src\src\main\java\com\example\controller\user\ApplicationRecordController.java
@@ -28,6 +29,7 @@ E:\DevelopmentProject\AI 智能客服 SaaS系统\ai-resume-system\src\src\main\java\co
 E:\DevelopmentProject\AI 智能客服 SaaS系统\ai-resume-system\src\src\main\java\com\example\security\JwtUtils.java
 E:\DevelopmentProject\AI 智能客服 SaaS系统\ai-resume-system\src\src\main\java\com\example\dto\UserSearchRequest.java
 E:\DevelopmentProject\AI 智能客服 SaaS系统\ai-resume-system\src\src\main\java\com\example\dto\AuthResponse.java
+E:\DevelopmentProject\AI 智能客服 SaaS系统\ai-resume-system\src\src\main\java\com\example\controller\user\PersonalCenterController.java
 E:\DevelopmentProject\AI 智能客服 SaaS系统\ai-resume-system\src\src\main\java\com\example\entity\ChatMessage.java
 E:\DevelopmentProject\AI 智能客服 SaaS系统\ai-resume-system\src\src\main\java\com\example\repository\ApplicationRecordRepository.java
 E:\DevelopmentProject\AI 智能客服 SaaS系统\ai-resume-system\src\src\main\java\com\example\config\MultipartConfig.java
@@ -46,8 +48,10 @@ E:\DevelopmentProject\AI 智能客服 SaaS系统\ai-resume-system\src\src\main\java\co
 E:\DevelopmentProject\AI 智能客服 SaaS系统\ai-resume-system\src\src\main\java\com\example\entity\resume\WorkExperience.java
 E:\DevelopmentProject\AI 智能客服 SaaS系统\ai-resume-system\src\src\main\java\com\example\entity\User.java
 E:\DevelopmentProject\AI 智能客服 SaaS系统\ai-resume-system\src\src\main\java\com\example\entity\resume\Project.java
+E:\DevelopmentProject\AI 智能客服 SaaS系统\ai-resume-system\src\src\main\java\com\example\service\user\PersonalCenterService.java
 E:\DevelopmentProject\AI 智能客服 SaaS系统\ai-resume-system\src\src\main\java\com\example\service\user\ChatService.java
 E:\DevelopmentProject\AI 智能客服 SaaS系统\ai-resume-system\src\src\main\java\com\example\Application.java
 E:\DevelopmentProject\AI 智能客服 SaaS系统\ai-resume-system\src\src\main\java\com\example\controller\user\ChatController.java
 E:\DevelopmentProject\AI 智能客服 SaaS系统\ai-resume-system\src\src\main\java\com\example\entity\resume\EducationExperience.java
 E:\DevelopmentProject\AI 智能客服 SaaS系统\ai-resume-system\src\src\main\java\com\example\repository\JobRepository.java
+E:\DevelopmentProject\AI 智能客服 SaaS系统\ai-resume-system\src\src\main\java\com\example\dto\UserUpdateDTO.java

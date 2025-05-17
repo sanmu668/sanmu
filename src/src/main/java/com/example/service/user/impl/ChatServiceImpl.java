@@ -9,10 +9,15 @@ import com.alibaba.dashscope.exception.InputRequiredException;
 import com.alibaba.dashscope.exception.NoApiKeyException;
 import com.example.entity.ChatMessage;
 import com.example.service.user.ChatService;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -28,16 +33,54 @@ public class ChatServiceImpl implements ChatService {
   private static final Generation generation = new Generation();
 
   @Override
-  public ChatMessage processMessage(Integer userId, String sessionId, String question) {
-    // 获取AI响应
-    String answer = getAiResponse(question);
+  public ChatMessage processMessage(Integer userId, String sessionId, String question, MultipartFile file) {
+    try{
+      String prompt;
 
-    // 保存对话记录并返回
-    return chatHistoryService.saveMessage(userId, sessionId, question, answer);
+      boolean hasFile = (file != null && !file.isEmpty());
+      boolean hasQuestion = (question != null && !question.isBlank());
+
+      if (hasFile){
+        String resumeText = extractTextFromPdf(file.getInputStream());
+        if (!hasQuestion){
+          question = "请根据这份简历给出优化建议，包括内容表达、格式排版和投递方向建议等...";
+        }
+        prompt = """
+                以下是用户上传的简历内容,请根据用户的提问给与专业建议：
+                
+                简历内容：
+                %s
+                
+                用户问题：
+                %s
+                """.formatted(resumeText,question);
+      }else {
+        if (!hasQuestion){
+          throw new IllegalArgumentException("请输入问题或上传简历");
+        }
+        prompt = question;
+      }
+
+      //获取历史对话记录
+      List<ChatMessage> history = chatHistoryService.getUserSession(userId, sessionId);
+
+      String answer = getAiResponse(prompt,history);
+
+      return chatHistoryService.saveMessage(userId,sessionId,question,answer);
+    }catch (Exception e){
+      throw new RuntimeException("处理信息失败：" + e.getMessage(),e);
+    }
+  }
+
+  private String extractTextFromPdf(InputStream inputStream)throws IOException {
+    try(PDDocument document = PDDocument.load(inputStream)){
+      PDFTextStripper stripper = new PDFTextStripper();
+      return stripper.getText(document);
+    }
   }
 
   @Override
-  public String getAiResponse(String question) {
+  public String getAiResponse(String question,List<ChatMessage> history) {
     try {
       // 创建消息列表
       List<Message> messages = new ArrayList<>();
@@ -74,6 +117,25 @@ public class ChatServiceImpl implements ChatService {
         """)
               .build());
 
+      //添加历史对话记录，限制最近的10轮对话
+      int historyLimit = 10;
+      int startIndex = Math.max(0,history.size() - historyLimit);
+      for (int i = startIndex;i<history.size();i++){
+        ChatMessage historyMessage = history.get(i);
+        //添加用户历史消息
+        messages.add(Message.builder()
+                .role("user")
+                .content(historyMessage.getQuestion())
+                .build());
+
+        //添加AI历史回复
+        messages.add(Message.builder()
+                .role("assistant")
+                .content(historyMessage.getAnswer())
+                .build());
+      }
+
+      //添加用户当前问题
       messages.add(Message.builder()
               .role("user")
               .content(question)

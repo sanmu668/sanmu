@@ -5,12 +5,21 @@
         <h1 class="main-title">智简未来</h1>
         <h2 class="sub-title">智能招聘系统</h2>
         <p class="description">高效智能的招聘解决方案，助力企业精准匹配人才</p>
-        <el-button type="primary" size="large" class="get-started-btn" @click="$router.push('/jobs')">
+        <el-button
+          type="primary"
+          size="large"
+          class="get-started-btn"
+          @click="$router.push('/jobs')"
+        >
           立即开始
         </el-button>
       </div>
       <div class="hero-image">
-        <img src="/src/assets/recruitment-illustration.svg" alt="recruitment" class="illustration" />
+        <img
+          src="@/assets/recruitment-illustration.svg"
+          alt="recruitment"
+          class="illustration"
+        />
       </div>
     </div>
 
@@ -75,7 +84,7 @@
     align-items: center;
     justify-content: space-between;
     margin-bottom: 60px;
-    
+
     .hero-content {
       flex: 1;
       padding-right: 60px;
@@ -106,7 +115,7 @@
         border-radius: 8px;
         background: linear-gradient(45deg, #409eff, #3498db);
         border: none;
-        
+
         &:hover {
           transform: translateY(-2px);
           box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
@@ -119,7 +128,7 @@
       flex: 1;
       display: flex;
       justify-content: center;
-      
+
       .illustration {
         max-width: 100%;
         height: auto;
@@ -135,7 +144,7 @@
       transition: transform 0.3s ease;
       border-radius: 12px;
       overflow: hidden;
-      
+
       &:hover {
         transform: translateY(-5px);
       }
@@ -145,7 +154,7 @@
         align-items: center;
         padding: 20px;
         background: linear-gradient(45deg, #f5f7fa, #e4e7eb);
-        
+
         .el-icon {
           font-size: 24px;
           margin-right: 12px;
@@ -161,7 +170,7 @@
 
       .card-content {
         padding: 20px;
-        
+
         p {
           color: #606266;
           font-size: 1rem;

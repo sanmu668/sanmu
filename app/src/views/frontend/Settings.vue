@@ -3,19 +3,22 @@
     <el-row :gutter="20">
       <el-col :span="8">
         <!-- 个人信息卡片 -->
-        <el-card class="user-card">
+        <el-card class="user-card" v-loading="loading.profile">
           <div class="avatar-container">
-            <el-avatar :size="100" :src="userInfo.avatar" />
+            <el-avatar :size="100" :src="userInfo.photo ? `data:image/jpeg;base64,${userInfo.photo}` : defaultAvatar" />
             <el-upload
               class="avatar-uploader"
-              action="/api/upload/avatar"
+              action="/api/user/personal/photo"
+              :headers="uploadHeaders"
               :show-file-list="false"
+              :before-upload="beforeAvatarUpload"
               :on-success="handleAvatarSuccess"
+              :on-error="handleAvatarError"
             >
               <el-button type="primary" link>更换头像</el-button>
             </el-upload>
           </div>
-          <h3>{{ userInfo.name || userInfo.email }}</h3>
+          <h3>{{ userInfo.username || userInfo.email }}</h3>
           <p class="user-email">{{ userInfo.email }}</p>
           <el-divider />
           <div class="user-stats">
@@ -37,22 +40,24 @@
 
       <el-col :span="16">
         <!-- 基本信息设置 -->
-        <el-card class="mb-20">
+        <el-card class="mb-20" v-loading="loading.basicInfo">
           <template #header>
             <div class="card-header">
               <span>基本信息</span>
-              <el-button type="primary" @click="saveBasicInfo">保存修改</el-button>
+              <el-button type="primary" @click="saveBasicInfo" :loading="loading.basicInfo">
+                保存修改
+              </el-button>
             </div>
           </template>
           
-          <el-form :model="basicForm" label-width="100px">
-            <el-form-item label="昵称">
-              <el-input v-model="basicForm.name" placeholder="请输入昵称" />
+          <el-form :model="basicForm" label-width="100px" ref="basicFormRef">
+            <el-form-item label="昵称" prop="username">
+              <el-input v-model="basicForm.username" placeholder="请输入昵称" />
             </el-form-item>
-            <el-form-item label="手机号码">
-              <el-input v-model="basicForm.phone" placeholder="请输入手机号码" />
+            <el-form-item label="手机号码" prop="number">
+              <el-input v-model="basicForm.number" placeholder="请输入手机号码" />
             </el-form-item>
-            <el-form-item label="个人简介">
+            <el-form-item label="个人简介" prop="bio">
               <el-input
                 v-model="basicForm.bio"
                 type="textarea"
@@ -64,11 +69,13 @@
         </el-card>
 
         <!-- 密码修改 -->
-        <el-card class="mb-20">
+        <el-card class="mb-20" v-loading="loading.password">
           <template #header>
             <div class="card-header">
               <span>修改密码</span>
-              <el-button type="primary" @click="changePassword">确认修改</el-button>
+              <el-button type="primary" @click="changePassword" :loading="loading.password">
+                确认修改
+              </el-button>
             </div>
           </template>
           
@@ -141,24 +148,60 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { FormInstance } from 'element-plus'
+import axios from 'axios'
+import { useRouter } from 'vue-router'
+
+// 创建axios实例并配置认证信息
+const api = axios.create({
+  baseURL: 'http://localhost:8080',
+  headers: {
+    'Content-Type': 'application/json',
+    'accept': '*/*'
+  }
+})
+
+// 添加请求拦截器设置token
+api.interceptors.request.use(config => {
+  const token = localStorage.getItem('token')
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+  return config
+})
+
+const defaultAvatar = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
+
+// Loading states
+const loading = reactive({
+  profile: false,
+  basicInfo: false,
+  password: false
+})
+
+// Upload headers for avatar upload
+const uploadHeaders = reactive({
+  Authorization: `Bearer ${localStorage.getItem('token')}`
+})
 
 // 用户信息
 const userInfo = reactive({
-  avatar: 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png',
-  name: '张三',
-  email: 'test@qq.com',
-  applicationCount: 12,
-  interviewCount: 3,
-  collectionCount: 5
+  photo: '',
+  username: '',
+  email: '',
+  number: '',
+  applicationCount: 0,
+  interviewCount: 0,
+  collectionCount: 0
 })
 
 // 基本信息表单
+const basicFormRef = ref<FormInstance>()
 const basicForm = reactive({
-  name: userInfo.name,
-  phone: '',
+  username: '',
+  number: '',
   bio: ''
 })
 
@@ -173,11 +216,13 @@ const passwordForm = reactive({
 const passwordRules = {
   oldPassword: [
     { required: true, message: '请输入当前密码', trigger: 'blur' },
-    { min: 6, message: '密码长度不能小于6位', trigger: 'blur' }
+    { min: 6, message: '密码长度不能小于6位', trigger: 'blur' },
+    { max: 20, message: '密码长度不能超过20位', trigger: 'blur' }
   ],
   newPassword: [
     { required: true, message: '请输入新密码', trigger: 'blur' },
-    { min: 6, message: '密码长度不能小于6位', trigger: 'blur' }
+    { min: 6, message: '密码长度不能小于6位', trigger: 'blur' },
+    { max: 20, message: '密码长度不能超过20位', trigger: 'blur' }
   ],
   confirmPassword: [
     { required: true, message: '请再次输入新密码', trigger: 'blur' },
@@ -201,35 +246,129 @@ const notificationForm = reactive({
   activityNotification: false
 })
 
-// 更新头像
+const router = useRouter()
+
+// 获取用户信息
+const fetchUserProfile = async () => {
+  loading.profile = true
+  try {
+    const response = await api.get('/api/user/personal/profile')
+    const data = response.data
+    Object.assign(userInfo, data)
+    basicForm.username = data.username
+    basicForm.number = data.number
+    basicForm.bio = data.bio || ''
+  } catch (error: any) {
+    console.error('Error fetching user profile:', error.response || error)
+    const errorMessage = error.response?.data?.message 
+      || error.response?.data 
+      || error.message 
+      || '获取用户信息失败'
+    ElMessage.error(errorMessage)
+    
+    if (error.response?.status === 401) {
+      router.push('/login')
+    }
+  } finally {
+    loading.profile = false
+  }
+}
+
+// 更新头像前的验证
+const beforeAvatarUpload = (file: File) => {
+  const isJPG = file.type === 'image/jpeg' || file.type === 'image/png'
+  const isLt2M = file.size / 1024 / 1024 < 2
+
+  if (!isJPG) {
+    ElMessage.error('头像图片只能是 JPG/PNG 格式!')
+  }
+  if (!isLt2M) {
+    ElMessage.error('头像图片大小不能超过 2MB!')
+  }
+  return isJPG && isLt2M
+}
+
+// 更新头像成功
 const handleAvatarSuccess = (response: any) => {
-  userInfo.avatar = response.url
+  userInfo.photo = response.data
   ElMessage.success('头像更新成功')
 }
 
+// 更新头像失败
+const handleAvatarError = () => {
+  ElMessage.error('头像上传失败')
+}
+
 // 保存基本信息
-const saveBasicInfo = () => {
-  ElMessage.success('基本信息保存成功')
+const saveBasicInfo = async () => {
+  if (!basicFormRef.value) return
+  
+  loading.basicInfo = true
+  try {
+    await api.put('/api/user/personal/basic-info', basicForm)
+    ElMessage.success('基本信息保存成功')
+    await fetchUserProfile() // 刷新用户信息
+  } catch (error: any) {
+    ElMessage.error(error.response?.data?.message || '保存失败')
+  } finally {
+    loading.basicInfo = false
+  }
 }
 
 // 修改密码
 const changePassword = async () => {
   if (!passwordFormRef.value) return
   
-  await passwordFormRef.value.validate((valid) => {
-    if (valid) {
-      ElMessage.success('密码修改成功')
-      passwordForm.oldPassword = ''
-      passwordForm.newPassword = ''
-      passwordForm.confirmPassword = ''
+  try {
+    await passwordFormRef.value.validate()
+    
+    // Validate password format before sending
+    if (passwordForm.newPassword === passwordForm.oldPassword) {
+      ElMessage.error('新密码不能与当前密码相同')
+      return
     }
-  })
+    
+    loading.password = true
+    
+    const passwordData = {
+      oldPassword: passwordForm.oldPassword.trim(),
+      newPassword: passwordForm.newPassword.trim(),
+      confirmPassword: passwordForm.confirmPassword.trim()
+    }
+    console.log('Password change request data:', passwordData)
+    
+    await api.put('/api/user/personal/password', passwordData)
+    
+    ElMessage.success('密码修改成功')
+    passwordForm.oldPassword = ''
+    passwordForm.newPassword = ''
+    passwordForm.confirmPassword = ''
+  } catch (error: any) {
+    if (error.response) {
+      console.error('Password change error:', error.response.data)
+      const errorMessage = error.response.data.message 
+        || error.response.data.error 
+        || '密码修改失败，请确保密码符合要求并且正确输入当前密码'
+      ElMessage.error(errorMessage)
+    } else if (error.message) {
+      ElMessage.error(error.message)
+    } else {
+      ElMessage.error('密码修改失败，请稍后重试')
+    }
+  } finally {
+    loading.password = false
+  }
 }
 
 // 保存通知设置
 const saveNotificationSettings = () => {
   ElMessage.success('通知设置保存成功')
 }
+
+// 页面加载时获取用户信息
+onMounted(() => {
+  fetchUserProfile()
+})
 </script>
 
 <style lang="scss" scoped>
