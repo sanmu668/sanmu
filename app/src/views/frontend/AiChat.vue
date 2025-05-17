@@ -399,6 +399,47 @@ const scrollToBottom = async () => {
   }
 }
 
+// 从后端加载历史对话
+const loadChatHistory = async () => {
+  try {
+    // 获取所有历史对话
+    const response = await getChatHistory({
+      userId: userId.value!,
+      sessionId: '' // 空字符串获取所有历史
+    })
+    
+    // 按时间戳排序，最新的在前面
+    const sortedHistory = response.sort((a, b) => 
+      new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+    )
+    
+    // 将历史记录转换为前端需要的格式
+    const uniqueSessions = new Map()
+    
+    sortedHistory.forEach(msg => {
+      if (!uniqueSessions.has(msg.sessionId)) {
+        uniqueSessions.set(msg.sessionId, {
+          id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+          sessionId: msg.sessionId,
+          title: msg.question?.slice(0, 20) + '...' || `对话 ${formatTimeFromTimestamp(msg.timestamp)}`,
+          lastMessage: msg.answer || msg.question || '',
+          timestamp: formatTimeFromTimestamp(msg.timestamp)
+        })
+      }
+    })
+    
+    chatHistory.value = Array.from(uniqueSessions.values())
+  } catch (error: any) {
+    console.error('加载历史对话失败:', error)
+    if (error.response?.status === 401) {
+      ElMessage.error('登录已过期，请重新登录')
+      router.push('/login')
+    } else {
+      ElMessage.error('加载历史对话失败')
+    }
+  }
+}
+
 // 保存对话到历史记录
 const saveChatToHistory = () => {
   if (!currentSessionId.value || messages.value.length === 0) return
@@ -410,7 +451,7 @@ const saveChatToHistory = () => {
   const chatTitle = currentChatTitle.value || 
     (lastUserMessage ? lastUserMessage.content.slice(0, 20) + '...' : `对话 ${formatTime()}`)
   
-  const savedChat: SavedChat = {
+  const savedChat = {
     id: Date.now().toString(),
     sessionId: currentSessionId.value,
     title: chatTitle,
@@ -424,17 +465,6 @@ const saveChatToHistory = () => {
     chatHistory.value[existingIndex] = savedChat
   } else {
     chatHistory.value.unshift(savedChat)
-  }
-  
-  // 保存到localStorage
-  localStorage.setItem('chatHistory', JSON.stringify(chatHistory.value))
-}
-
-// 从localStorage加载历史对话
-const loadChatHistory = () => {
-  const savedHistory = localStorage.getItem('chatHistory')
-  if (savedHistory) {
-    chatHistory.value = JSON.parse(savedHistory)
   }
 }
 
@@ -468,9 +498,8 @@ const handleSendMessage = async () => {
   loading.value = true
   try {
     const response = await sendChatMessage({
-      userId: userId.value!,
-      sessionId: currentSessionId.value,
-      question: userQuestion
+      question: userQuestion,
+      sessionId: currentSessionId.value
     })
     
     if (response) {
@@ -520,7 +549,6 @@ const saveRename = () => {
     const index = chatHistory.value.findIndex(c => c.id === selectedChatId.value)
     if (index !== -1) {
       chatHistory.value[index].title = editingName.value
-      localStorage.setItem('chatHistory', JSON.stringify(chatHistory.value))
     }
   }
   isEditingName.value = false
@@ -532,7 +560,6 @@ const handleDelete = async (item: SavedChat) => {
   const index = chatHistory.value.findIndex(c => c.id === item.id)
   if (index !== -1) {
     chatHistory.value.splice(index, 1)
-    localStorage.setItem('chatHistory', JSON.stringify(chatHistory.value))
     if (selectedChatId.value === item.id) {
       selectedChatId.value = null
       await startNewChat()
@@ -567,8 +594,19 @@ onMounted(async () => {
   
   if (getUserInfo()) {
     console.log('用户已登录，userId:', userId.value)
-    loadChatHistory()
-    await startNewChat()
+    try {
+      // 先加载历史对话
+      await loadChatHistory()
+      console.log('历史对话加载成功')
+      
+      // 如果没有选中的对话，创建新对话
+      if (!selectedChatId.value) {
+        await startNewChat()
+      }
+    } catch (error) {
+      console.error('初始化失败:', error)
+      ElMessage.error('加载历史对话失败，请刷新页面重试')
+    }
   } else {
     console.log('用户未登录或登录状态无效')
   }
@@ -631,7 +669,6 @@ const handleSendMessageWithFile = async (file: File) => {
   loading.value = true
   try {
     const response = await sendChatMessage({
-      userId: userId.value!,
       sessionId: currentSessionId.value,
       file: file
     })
@@ -639,7 +676,7 @@ const handleSendMessageWithFile = async (file: File) => {
     if (response) {
       const aiMessage: LocalMessage = {
         ...response,
-        content: response.answer || '',
+        content: formatAIResponse(response.answer || ''),
         type: 'ai',
         time: formatTimeFromTimestamp(response.timestamp)
       }

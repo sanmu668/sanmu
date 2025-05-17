@@ -33,8 +33,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import request from '@/api/request'
+import { API_CONFIG, API_ENDPOINTS } from '@/config'
 import { openPdfPreview } from '@/utils/pdfPreview'
 
 const router = useRouter()
@@ -57,16 +58,7 @@ const fetchResumeList = async () => {
   loading.value = true
   error.value = ''
   try {
-    const token = localStorage.getItem('token')
-    const response = await axios.get(`/api/user/resumes`, {
-      baseURL: 'http://localhost:8080',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        'accept': '*/*'
-      }
-    })
-    
+    const response = await request.get(API_ENDPOINTS.USER.RESUMES)
     if (response.data) {
       resumeList.value = Array.isArray(response.data) ? response.data : [response.data]
     } else {
@@ -102,8 +94,7 @@ const viewResume = async (row: ResumeItem) => {
       return
     }
 
-    const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
-    const pdfUrl = `${baseURL}/api/user/resumes/pdf/${row.id}`
+    const pdfUrl = `${API_CONFIG.BASE_URL}${API_ENDPOINTS.USER.RESUMES}/pdf/${row.id}`
 
     openPdfPreview({
       title: row.title,
@@ -127,14 +118,7 @@ const handleDelete = (resume: ResumeItem) => {
     }
   ).then(async () => {
     try {
-      const token = localStorage.getItem('token')
-      await axios.delete(`/api/user/resumes/${resume.id}`, {
-        baseURL: 'http://localhost:8080',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        }
-      })
+      await request.delete(`${API_ENDPOINTS.USER.RESUMES}/${resume.id}`)
       ElMessage.success('删除成功')
       fetchResumeList()
     } catch (err: any) {

@@ -57,11 +57,6 @@ public class ChatController {
     return ResponseEntity.ok(history);
   }
 
-  @GetMapping("/recent")
-  public ResponseEntity<List<ChatMessage>> getRecentHistory(@RequestParam(defaultValue = "10") int limit) {
-    List<ChatMessage> history = chatHistoryService.findTopNByUserIdOrderByTimestampDesc(getUserId(), limit);
-    return ResponseEntity.ok(history);
-  }
 
   private Integer getUserId(){
     String email = SecurityContextHolder.getContext().getAuthentication().getName();

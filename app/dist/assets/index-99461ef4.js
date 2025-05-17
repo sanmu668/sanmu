@@ -1,0 +1,1 @@
+const a={BASE_URL:"http://localhost:8080",TIMEOUT:3e4,TIMEOUT_MESSAGE:"请求超时，请检查网络连接或稍后重试"},s={USER:{RESUMES:"/api/user/resumes",JOBS:"/api/user/jobs",APPLICATIONS:"/api/applications/user"},ADMIN:{RESUMES:"/api/admin/resumes",APPLICATIONS:"/api/admin/applications"},APPLICATIONS:{SUBMIT:"/api/applications/sumit"}};export{s as A,a};

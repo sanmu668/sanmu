@@ -1,0 +1,1 @@
+import{a as o}from"./axios-3a665b0f.js";const t=o.create({baseURL:{}.VITE_BASE_API||"",timeout:3e4});t.interceptors.request.use(e=>{const r=localStorage.getItem("token");return r&&(e.headers.Authorization=`Bearer ${r}`),e},e=>Promise.reject(e));t.interceptors.response.use(e=>e.data,e=>Promise.reject(e));export{t as r};

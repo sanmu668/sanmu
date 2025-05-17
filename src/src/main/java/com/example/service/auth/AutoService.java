@@ -34,9 +34,15 @@ public class AutoService {
         if (userRepository.findByEmail(request.getEmail()).isPresent()){
             throw new RuntimeException("Email already exists");
         }
+
+        String email = request.getEmail();
         //创建新的用户对象
         User user = new User();
-        user.setEmail(request.getEmail());
+
+        int atIndex = email.indexOf("@");
+        user.setUsername(email.substring(0,atIndex));
+
+        user.setEmail(email);
         //哈希加密
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         //设置用户创建和更新的时间

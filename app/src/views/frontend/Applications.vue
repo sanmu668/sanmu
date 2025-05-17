@@ -103,7 +103,8 @@
 import { ref, watch, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { MoreFilled, View, Delete } from '@element-plus/icons-vue'
-import axios from 'axios'
+import request from '@/api/request'
+import { API_ENDPOINTS } from '@/config'
 
 // 导出图标组件供模板使用
 const icons = {
@@ -139,15 +140,7 @@ const applicationList = ref<Application[]>([])
 const loadData = async () => {
   loading.value = true
   try {
-    const token = localStorage.getItem('token')
-    const response = await axios.get(`/api/applications/user`,{
-      baseURL: 'http://localhost:8080',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        'accept': '*/*'
-      }
-    })
+    const response = await request.get(API_ENDPOINTS.USER.APPLICATIONS)
     
     if (response.data && Array.isArray(response.data)) {
       // 转换后端数据格式为前端所需格式

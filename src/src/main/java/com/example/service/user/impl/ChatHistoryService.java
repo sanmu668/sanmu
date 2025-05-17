@@ -33,24 +33,11 @@ public class ChatHistoryService {
     return chatMessageRepository.findByUserId(userId);
   }
 
-  /*
-  根据会话ID获取对话记录
-   */
-  public List<ChatMessage> getSessionHistory(String sessionId){
-    return chatMessageRepository.findBySessionId(sessionId);
-  }
 
   /*
   根据用户ID和会话ID获取对话记录
    */
   public List<ChatMessage> getUserSession(Integer userId,String sessionId){
     return chatMessageRepository.findByUserIdAndSessionId(userId,sessionId);
-  }
-
-  /*
-  根据用户ID获取最新的对话记录
-   */
-  public List<ChatMessage> findTopNByUserIdOrderByTimestampDesc(Integer userId,int limit){
-    return chatMessageRepository.findByUserIdOrderByTimestampDesc(userId,limit);
   }
 }

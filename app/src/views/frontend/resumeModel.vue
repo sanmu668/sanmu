@@ -123,7 +123,8 @@ import html2pdf from 'html2pdf.js/dist/html2pdf.bundle.min.js'
 import { ref, computed, watch, onMounted, defineAsyncComponent, h } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElAlert, ElMessage, ElMessageBox } from 'element-plus'
-
+import request from '@/api/request'
+import { API_CONFIG, API_ENDPOINTS } from '@/config'
 
 const generating = ref(false)
 // 使用异步组件导入模板
@@ -437,11 +438,11 @@ const validateResumeData = () => {
   }
 }
 
-// 保存简历信息到服务器
-const saveResumeInfo = async (pdfBlob, fileName) => {
+const saveResume = async () => {
   try {
-    // 获取认证token
-    const token = localStorage.getItem('token')
+    generating.value = true
+    const pdfBlob = await generatePdf()
+    const fileName = `${resumeData.value.name.first}${resumeData.value.name.last}的简历.pdf`
 
     // 创建FormData对象
     const formData = new FormData()
@@ -460,116 +461,39 @@ const saveResumeInfo = async (pdfBlob, fileName) => {
       fileName: fileName
     })
 
-    const response = await fetch('http://localhost:8080/api/user/resumes/save', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`
-        // 不要设置 Content-Type，让浏览器自动处理
-      },
-      credentials: 'include',
-      body: formData
-    })
-
-    console.log('响应状态:', response.status)
-    const responseText = await response.text()
-    console.log('响应内容:', responseText)
-
-    if (!response.ok) {
-      let errorMessage = '保存失败'
-      try {
-        const errorData = JSON.parse(responseText)
-        errorMessage = errorData.message || errorData.error || errorMessage
-        
-        if (response.status === 401) {
-          errorMessage = '请先登录后再保存简历'
-          localStorage.removeItem('token')
-          localStorage.removeItem('userId')
-          router.push('/login')
-        } else if (response.status === 400) {
-          console.error('请求数据:', formData)
-          console.error('错误响应:', errorData)
-          if (errorData.error === 'Missing request attribute \'userId\'') {
-            errorMessage = '用户未登录或登录已过期，请重新登录'
-            router.push('/login')
-          } else {
-            errorMessage = '请求数据格式错误，请检查数据格式'
-          }
-        }
-      } catch (e) {
-        errorMessage = `保存失败 (${response.status}: ${response.statusText})`
-        if (responseText) {
-          errorMessage += ` - ${responseText}`
-        }
-      }
-      throw new Error(errorMessage)
+    const token = localStorage.getItem('token')
+    if (!token) {
+      throw new Error('未登录状态')
     }
-   
-    const result = JSON.parse(responseText)
-    console.log('简历保存成功：', result)
-    ElMessage.success('简历保存成功！')
-    return result
-  } catch (error) {
-    console.error('保存失败：', error)
-    ElMessage.error(error.message)
-    throw error
-  }
-}
 
-const saveResume = async() => {
-  if (generating.value) {
-    return
-  }
-  
-  generating.value = true
-  try {
-    // 验证数据
-    validateResumeData()
-    
-    // 生成PDF Blob
-    const pdfBlob = await generatePdf()
-    
-    // 默认文件名
-    const fileName = `${resumeData.value.name.first}${resumeData.value.name.last}的简历.pdf`
-    
-    // 先保存到服务器
-    await saveResumeInfo(pdfBlob, fileName)
-    
-    // 检查浏览器是否支持 File System Access API
-    if ('showSaveFilePicker' in window) {
-      try {
-        const handle = await window.showSaveFilePicker({
-          suggestedName: fileName,
-          types: [{
-            description: 'PDF文件',
-            accept: {'application/pdf': ['.pdf']}
-          }]
-        })
-        
-        // 保存文件到本地
-        const writable = await handle.createWritable()
-        await writable.write(pdfBlob)
-        await writable.close()
-        
-        // 保存成功后关闭编辑抽屉
-        editDrawerVisible.value = false
-        
-      } catch (error) {
-        if (error.name === 'AbortError') {
-          // 用户取消了本地保存操作
-          return
+    const response = await request.post(
+      `${API_ENDPOINTS.USER.RESUMES}/save`,
+      formData,
+      {
+        headers: {
+          // 不要设置 Content-Type，让浏览器自动处理
+          Authorization: `Bearer ${token}`
         }
-        throw error
       }
+    )
+
+    if (response.status === 200) {
+      ElMessage.success('简历保存成功')
+      router.push('/resume')
     } else {
-      // 使用后备方案保存到本地
-      await fallbackSaveResume(pdfBlob, fileName)
-      
-      // 保存成功后关闭编辑抽屉
-      editDrawerVisible.value = false
+      throw new Error('保存失败：服务器返回异常状态码')
     }
-    
   } catch (error) {
-    ElMessage.error(error.message)
+    console.error('保存简历失败:', error)
+    ElMessage.error(error.message || '保存失败，请重试')
+    // 如果保存到服务器失败，尝试本地下载
+    try {
+      await fallbackSaveResume(pdfBlob, fileName)
+      ElMessage.warning('无法保存到服务器，已下载到本地')
+    } catch (downloadError) {
+      console.error('本地下载也失败:', downloadError)
+      ElMessage.error('保存完全失败，请重试')
+    }
   } finally {
     generating.value = false
   }

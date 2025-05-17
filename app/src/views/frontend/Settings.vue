@@ -148,42 +148,25 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { FormInstance } from 'element-plus'
-import axios from 'axios'
 import { useRouter } from 'vue-router'
+import request from '@/api/request'
 
-// 创建axios实例并配置认证信息
-const api = axios.create({
-  baseURL: 'http://localhost:8080',
-  headers: {
-    'Content-Type': 'application/json',
-    'accept': '*/*'
-  }
-})
+// 默认头像
+const defaultAvatar = 'path/to/default/avatar.png'
 
-// 添加请求拦截器设置token
-api.interceptors.request.use(config => {
-  const token = localStorage.getItem('token')
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
-  }
-  return config
-})
-
-const defaultAvatar = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
+// 上传头像的headers
+const uploadHeaders = computed(() => ({
+  Authorization: `Bearer ${localStorage.getItem('token')}`
+}))
 
 // Loading states
 const loading = reactive({
   profile: false,
   basicInfo: false,
   password: false
-})
-
-// Upload headers for avatar upload
-const uploadHeaders = reactive({
-  Authorization: `Bearer ${localStorage.getItem('token')}`
 })
 
 // 用户信息
@@ -252,7 +235,7 @@ const router = useRouter()
 const fetchUserProfile = async () => {
   loading.profile = true
   try {
-    const response = await api.get('/api/user/personal/profile')
+    const response = await request.get('/api/user/personal/profile')
     const data = response.data
     Object.assign(userInfo, data)
     basicForm.username = data.username
@@ -305,7 +288,7 @@ const saveBasicInfo = async () => {
   
   loading.basicInfo = true
   try {
-    await api.put('/api/user/personal/basic-info', basicForm)
+    await request.put('/api/user/personal/basic-info', basicForm)
     ElMessage.success('基本信息保存成功')
     await fetchUserProfile() // 刷新用户信息
   } catch (error: any) {
@@ -337,7 +320,7 @@ const changePassword = async () => {
     }
     console.log('Password change request data:', passwordData)
     
-    await api.put('/api/user/personal/password', passwordData)
+    await request.put('/api/user/personal/password', passwordData)
     
     ElMessage.success('密码修改成功')
     passwordForm.oldPassword = ''

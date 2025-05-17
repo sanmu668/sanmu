@@ -190,7 +190,8 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, onBeforeUnmount, watch } from 'vue'
 import { ElMessage } from 'element-plus'
-import axios from 'axios'
+import request from '@/api/request'
+import { API_CONFIG, API_ENDPOINTS } from '@/config'
 
 interface Job {
   id: number
@@ -281,7 +282,7 @@ const fetchJobs = async () => {
       size: pageSize.value
     })
 
-    const response = await axios.get<ApiResponse>('http://localhost:8080/api/user/jobs', {
+    const response = await request.get(API_ENDPOINTS.USER.JOBS, {
       params: {
         jobName: searchForm.keyword,
         location: searchForm.city,
@@ -292,49 +293,13 @@ const fetchJobs = async () => {
     })
 
     console.log('获取到的原始职位数据:', response.data)
-
-    // 验证并处理返回的数据
     if (response.data && Array.isArray(response.data.content)) {
-      jobList.value = response.data.content.map(job => {
-        // 打印每个职位的原始数据
-        console.log('处理职位数据:', job)
-        
-        // 确保返回一个有效的职位对象
-        const processedJob = {
-          id: Number(job.id) || 0, // 确保 id 是数字类型
-          jobName: job.jobName || '未知职位',
-          department: job.department || '未知部门',
-          salaryRange: job.salaryRange || '面议',
-          experience: job.experience || '无要求',
-          education: job.education || '无要求',
-          jobType: job.jobType || '全职',
-          description: job.description || '',
-          requirements: job.requirements || '',
-          company: job.company || '未知公司',
-          location: job.location || '未知地点',
-          tags: typeof job.tags === 'string' ? job.tags : '',
-          status: job.status || '在招'
-        }
-
-        // 验证处理后的数据
-        if (!processedJob.id) {
-          console.warn('警告：职位ID无效:', processedJob)
-        }
-
-        return processedJob
-      })
-
-      console.log('处理后的职位列表:', jobList.value)
-    } else {
-      console.error('获取到的职位数据格式不正确:', response.data)
-      jobList.value = []
+      jobList.value = response.data.content
+      total.value = response.data.totalElements
     }
-    
-    total.value = response.data.totalElements || 0
   } catch (error) {
     console.error('获取职位列表失败:', error)
     ElMessage.error('获取职位列表失败')
-    jobList.value = []
   } finally {
     loading.value = false
   }
@@ -377,20 +342,10 @@ const fetchResumeList = async () => {
       throw new Error('未登录状态')
     }
     
-    const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
-    const response = await axios.get(`${baseURL}/api/user/resumes`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        'Accept': '*/*'
-      },
-      timeout: 10000 // 10 seconds timeout
-    })
-    
+    const response = await request.get(API_ENDPOINTS.USER.RESUMES)
     console.log('简历列表响应:', response)
     
     if (response.data && response.status === 200) {
-      // 确保返回的数据是数组
       resumeList.value = Array.isArray(response.data) ? response.data : 
                         Array.isArray(response.data.content) ? response.data.content : 
                         [response.data]
@@ -403,34 +358,10 @@ const fetchResumeList = async () => {
       console.error('响应数据格式不正确:', response)
       throw new Error('获取简历列表失败：响应数据格式不正确')
     }
-  } catch (error: any) {
+  } catch (error) {
     console.error('获取简历列表失败:', error)
+    ElMessage.error('获取简历列表失败')
     resumeList.value = []
-    
-    if (error.response) {
-      // 服务器响应错误
-      switch (error.response.status) {
-        case 401:
-          ElMessage.error('登录已过期，请重新登录')
-          // 可以在这里添加重定向到登录页面的逻辑
-          break
-        case 403:
-          ElMessage.error('没有权限访问简历列表')
-          break
-        case 404:
-          ElMessage.error('找不到简历列表资源')
-          break
-        default:
-          ElMessage.error(`获取简历列表失败: ${error.response.data?.message || '服务器错误'}`)
-      }
-    } else if (error.request) {
-      // 请求发出但没有收到响应
-      ElMessage.error('服务器无响应，请检查网络连接')
-    } else {
-      // 请求配置出错
-      ElMessage.error(`获取简历列表失败: ${error.message || '未知错误'}`)
-    }
-    throw error
   } finally {
     resumeLoading.value = false
     console.groupEnd()
@@ -562,7 +493,6 @@ const applyJob = async () => {
   console.log('开始发送投递请求')
   
   try {
-    // 再次验证数据
     if (!currentJob.value?.id) {
       throw new Error('职位信息无效')
     }
@@ -579,39 +509,20 @@ const applyJob = async () => {
     
     console.log('请求数据：', requestData)
     
-    const response = await axios.post(
-      'http://localhost:8080/api/applications/sumit', 
-      requestData,
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        }
-      }
-    )
+    const response = await request.post(API_ENDPOINTS.APPLICATIONS.SUBMIT, requestData)
 
     console.log('投递响应：', response)
-
+    
     if (response.status >= 200 && response.status < 300) {
-      ElMessage.success(`简历已成功投递到"${currentJob.value.jobName}"职位`)
+      ElMessage.success('简历投递成功')
       resumeSelectVisible.value = false
       selectedResumeId.value = ''
-      // 清除保存的职位信息
-      localStorage.removeItem(CURRENT_JOB_KEY)
-      console.log('投递成功，已清除本地存储')
     } else {
-      throw new Error('服务器响应异常')
+      throw new Error('投递失败：服务器返回异常状态码')
     }
   } catch (error: any) {
-    console.error('投递请求失败：', error)
-    if (error.response?.data) {
-      console.error('服务器错误信息：', error.response.data)
-      ElMessage.error(error.response.data.message || '投递失败，请重试')
-    } else {
-      ElMessage.error(`投递失败: ${error.message || '请重试'}`)
-    }
-    throw error
+    console.error('投递失败:', error)
+    ElMessage.error(error.message || '投递失败，请重试')
   } finally {
     console.groupEnd()
   }
@@ -693,39 +604,6 @@ watch(resumeSelectVisible, async (newValue) => {
     await fetchResumeList()
   }
 })
-
-// 添加请求拦截器
-axios.interceptors.request.use(
-  config => {
-    console.log('发送请求:', {
-      url: config.url,
-      method: config.method,
-      headers: config.headers,
-      data: config.data
-    })
-    return config
-  },
-  error => {
-    console.error('请求错误:', error)
-    return Promise.reject(error)
-  }
-)
-
-// 添加响应拦截器
-axios.interceptors.response.use(
-  response => {
-    console.log('收到响应:', {
-      status: response.status,
-      headers: response.headers,
-      data: response.data
-    })
-    return response
-  },
-  error => {
-    console.error('响应错误:', error)
-    return Promise.reject(error)
-  }
-)
 
 // 处理对话框关闭
 const handleDialogClose = () => {
